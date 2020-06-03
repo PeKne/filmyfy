@@ -1,0 +1,5 @@
+---
+applications:
+ - name: Filmyfy-server
+   host: filmyfy-rest
+   memory: 512M

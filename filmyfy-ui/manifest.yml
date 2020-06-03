@@ -1,0 +1,5 @@
+---
+applications:
+ - name: Filmyfy-ui
+   host: filmyfy
+   memory: 512M
