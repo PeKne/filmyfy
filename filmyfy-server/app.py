@@ -1,5 +1,5 @@
 from cloudant import Cloudant
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify
 import atexit
 import os
 import json
@@ -79,10 +79,60 @@ def put_visitor():
         print('No database')
         return jsonify(data)
 
+
 @atexit.register
 def shutdown():
     if client:
         client.disconnect()
+
+
+#  API documentation: https://filmify.docs.apiary.io
+
+# register new user
+@app.route('/api/user/register/', methods=['POST'])
+def register_user():
+    pass
+
+# login user
+@app.route('/api/user/login/', methods=['POST'])
+def login_user():
+    pass
+
+# delete user account
+@app.route('/api/user/delete/', methods=['DELETE'])
+def remove_user():
+    pass
+
+# find a movie by text string
+@app.route('/api/movie/find/', methods=['GET'])
+def find_movies():
+    pass
+
+# find similar movies to the one identified by movie_id
+@app.route('/api/movie/similar/<movie_id>/', methods=['GET'])
+def list_similar_movies():
+    pass
+
+# recommend movies according to user profile history
+@app.route('/api/movie/recommend/<username>/', methods=['GET'])
+def recommend_by_profile():
+    pass
+
+# return movies seen by user
+@app.route('/api/movie/seen/<username>/', methods=['GET'])
+def get_seen_movies():
+    pass
+
+# add movie/actor/director/category to favourites
+@app.route('/api/favourite/add/', methods=['POST'])
+def add_to_favourites():
+    pass
+
+# remove movie/actor/director/category from favourites
+@app.route('/api/favourite/remove/', methods=['DELETE'])
+def remove_from_favourites():
+    pass
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port, debug=True)
