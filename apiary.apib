@@ -1,0 +1,171 @@
+FORMAT: 1A
+
+# filmyfy
+
+Simple RESTful API of our backend Flask server. Created for communication with frontend React.js server.
+
+# Group Users /user/
+
+## /api/user/register/
+
+### POST
+Register a new user account.
+
++ Request (application/json)
+    
+    + Headers
+
+            Authorization: Token superSecretTokenOfFrontendServer
+    
+    + Body
+    
+            {
+                "username": "MovieFan",
+                "name": "Movie Fan",
+                "email": "moviefan@holywood.com",
+                "password": "superLongHashString"
+            }
+
+
+## /api/user/login/
+
+### POST
+Authenticate an user.
+
++ Request (application/json)
+    
+    + Headers
+
+            Authorization: Token superSecretTokenOfFrontendServer
+    
+    + Body
+    
+            {
+                "username": "MovieFan",
+                "password": "superLongHashString"
+            }
+            
+
+## /api/user/delete/
+
+### DELETE
+Delete an user account.
+
++ Request (application/json)
+    
+    + Headers
+
+            Authorization: Token superSecretTokenOfFrontendServer
+    
+    + Body
+    
+            {
+                "username": "MovieFan",
+                "password": "superLongHashString"
+            }
+            
+
+ 
+# Group Movies /movie/
+
+## /api/movie/find/
+
+### POST
+Find a movie by text string.
+
++ Request (application/json)
+    
+    + Headers
+
+            Authorization: Token superSecretTokenOfFrontendServer
+    
+    + Body
+    
+            {
+                "search-string": "Straight Outta Compton"
+                
+            }
+            
+
+## /api/movie/similar/{movie_id}/
+
+### GET
+Get list of similar movies to movie specified by `movie_id`.
+
++ Request (application/json)
+    
+    + Headers
+
+            Authorization: Token superSecretTokenOfFrontendServer
+            
+
+## /api/movie/recommend/{username}/
+
+### GET
+Recommend movies acording to user profile history.
+
++ Request (application/json)
+    
+    + Headers
+
+            Authorization: Token superSecretTokenOfFrontendServer
+
+
+## /api/movie/seen/{username}/
+
+### GET
+Get list of seen movies by specific user profile.
+
++ Request (application/json)
+    
+    + Headers
+
+            Authorization: Token superSecretTokenOfFrontendServer
+    
+
+
+  
+            
+# Group Favourites /favourite/
+
+## /api/favourite/add/
+
+### POST
+Add movie/actor/director/category to favourites.
+
++ Request (application/json)
+    
+    + Headers
+
+            Authorization: Token superSecretTokenOfFrontendServer
+    
+    + Body
+    
+            {
+                "username": "MovieFan",
+                "type": "movie / actor / director / category",
+                "id": "movie/actor/director/category ID"
+                
+            }
+            
+
+
+## /api/favourite/remove/
+
+### DELETE
+Remove movie/actor/director/category from favourites.
+
++ Request (application/json)
+    
+    + Headers
+
+            Authorization: Token superSecretTokenOfFrontendServer
+    
+    + Body
+    
+            {
+                "username": "MovieFan",
+                "type": "movie / actor / director / category",
+                "id": "movie/actor/director/category ID"
+                
+            }
