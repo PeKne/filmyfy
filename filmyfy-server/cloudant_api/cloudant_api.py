@@ -7,8 +7,8 @@ from flask import jsonify
 
 class CloudantApi:
     db_name = 'users'
-    client = None
-    user_db = None
+    client = None  # client for work with cloudant db
+    user_db = None  # represents table, only one table is required for the purpose of this app
 
     def __init__(self):
         self.init_client()
@@ -46,11 +46,13 @@ class CloudantApi:
 
         self.user_db = self.client.create_database(self.db_name, throw_on_exists=False)
 
-    def disconnect(self):
-        if self.client:
-            self.client.disconnect()
-
     def get_user(self, nickname):
+        """
+        Retrieves specific user by nickname
+
+        :param nickname: strgin with user's nickname
+        :return:
+        """
         if nickname in self.user_db:
             return jsonify(self.user_db[nickname])
         else:
@@ -58,9 +60,21 @@ class CloudantApi:
             return jsonify([])
 
     def get_users(self):
+        """
+        Retrieves all users
+
+        :return: json list of users
+        """
         return jsonify(list(self.user_db))
 
     def create_user(self, nickname, password):
+        """
+        Creates a user with unique nickname and password
+
+        :param nickname: unique string characterizing user
+        :param password: password string
+        :return: json with created user
+        """
         data = {
             '_id': nickname,
             'password': password,
@@ -89,6 +103,13 @@ class CloudantApi:
             return jsonify([])
 
     def add_favourite_movie(self, nickname, movie):
+        """
+        Add a movie to the list of user's favourite movies
+
+        :param nickname: nickname of the user
+        :param movie: movie title
+        :return: json list of movie titles
+        """
         if nickname in self.user_db:
             user = self.user_db[nickname]
             user['favouriteMovies'].append(movie)
@@ -99,8 +120,18 @@ class CloudantApi:
             return jsonify([])
 
     def get_user_favourite_movies(self, nickname):
+        """
+        Retrieves user's favourite movies
+
+        :param nickname: nickname of the user
+        :return: json list of movie titles
+        """
         if nickname in self.user_db:
             return jsonify(self.user_db[nickname]['favouriteMovies'])
         else:
             print('No user with nickname ', nickname, 'exists')
             return jsonify([])
+
+    def disconnect(self):
+        if self.client:
+            self.client.disconnect()
