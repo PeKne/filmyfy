@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 import atexit
 import os
 import json
+from filmyfy_libs.filmyfy_imdb import FilmyfyIMDB
 
 app = Flask(__name__, static_url_path='')
 
