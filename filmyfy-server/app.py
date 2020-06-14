@@ -1,11 +1,15 @@
 import atexit
 import os
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 
 from cloudant_api.cloudant_api import CloudantApi
+from utils import authentication
 
 app = Flask(__name__, static_url_path='')
+CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 # On IBM Cloud Cloud Foundry, get the port number from the environment variable PORT
 # When running this app on the local machine, default the port to 8000
@@ -17,14 +21,28 @@ cloudantApi = None
 # register new user
 @app.route('/api/user/register/', methods=['POST'])
 def register_user():
-    nickname = request.json['nickname']
-    password = request.json['password']
-    return cloudantApi.create_user(nickname, password)
+    nickname = request.json['username']
+    password_hash = authentication.hash_password(request.json['password'])
+    return cloudantApi.create_user(nickname, password_hash)
 
 # login user
-@app.route('/api/user/login/', methods=['POST'])
+@app.route('/api/user/login/', methods=['POST', 'OPTIONS'])
+@cross_origin()
 def login_user():
-    return cloudantApi.add_seen_movie('Givi Cross', 'Movie1')
+    nickname = request.json['username']
+    entered_password = request.json['password']
+
+    user = cloudantApi.get_user(nickname)
+    if not user:
+        return ""
+
+    stored_password = user['password']
+
+    if authentication.verify_password(stored_password, entered_password):
+        response = jsonify(nickname)
+        return response
+    else:
+        return ""
 
 # delete user account
 @app.route('/api/user/delete/', methods=['DELETE'])

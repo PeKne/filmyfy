@@ -50,14 +50,14 @@ class CloudantApi:
         """
         Retrieves specific user by nickname
 
-        :param nickname: strgin with user's nickname
+        :param nickname: string with user's nickname
         :return:
         """
         if nickname in self.user_db:
-            return jsonify(self.user_db[nickname])
+            return self.user_db[nickname]
         else:
             print('No user with nickname ', nickname, 'exists')
-            return jsonify([])
+            return None
 
     def get_users(self):
         """
