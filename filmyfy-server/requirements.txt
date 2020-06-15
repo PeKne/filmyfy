@@ -1,3 +1,4 @@
 Flask>=1.0.0
+flask-cors
 cloudant==2.13.0
 IMDbPY

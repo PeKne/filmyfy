@@ -19,7 +19,7 @@ function Copyright() {
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://gitlab.fi.muni.cz/xkaleta2/pa165-red-team-blablacar/">
-        BlaBlaCar by the <b>Red Team</b>
+        Filmyfy by the <b>Petr Knetl, Petr Kostka, Dominik Brazdil</b>
       </Link>
       {` ${new Date().getFullYear()}.`}
     </Typography>
@@ -49,8 +49,6 @@ const useStyles = makeStyles((theme) => ({
 /**
  * Component for logging in with username (email) and password.
  * Based on <a href="https://github.com/mui-org/material-ui/blob/master/docs/src/pages/getting-started/templates/sign-in/SignIn.js">this</a>.
- *
- * @author Tatiana Fritzová
  */
 const SignIn = () => {
   const classes = useStyles();
