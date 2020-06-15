@@ -22,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
 /**
  * Application menu
  *
- * @author Tatiana Fritzová
  */
 const Menu = () => {
   const classes = useStyles();
