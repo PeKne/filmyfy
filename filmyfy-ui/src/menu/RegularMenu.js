@@ -26,25 +26,14 @@ const RegularMenu = () => {
   return (
     <>
       <Typography className={classes.title} variant="h3" noWrap edge="start">
-        <b>BlaBlaCar</b>
-        <Typography display="inline"
-                    variant="caption"
-                     style={{color: "red"}}
-         >
-           by the Red Team
-         </Typography>
+        <b>Filmyfy</b>
        </Typography>
        <Button color="secondary">
-         <Link to={`/ride/search`} className={classes.link}>Find a ride</Link>
+         <Link to={`/ride/search`} className={classes.link}>Recommended movies</Link>
        </Button>
        <Button color="secondary">
          <Link to={`/ride/offer`} className={classes.link}>Offer a ride</Link>
        </Button>
-       {!userContext.userInfo &&
-       <Button color="secondary">
-         <Link to={`/sign-in`} className={classes.link}>Sign in</Link>
-       </Button>
-       }
        {userContext.userInfo &&
        <UserMenu/>
        }
