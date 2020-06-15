@@ -29,7 +29,8 @@ class FilmyfyIMDB:
             "plot": movie["plot"],
             "genres": movie["genres"],
             "rating": movie["rating"],
-            "cover url": movie["cover url"]
+            "cover url": movie["cover url"],
+            "keywords": self.imdb.get_movie_keywords(movie_id)['data']['keywords']
         }
         return result
 
@@ -50,4 +51,13 @@ class FilmyfyIMDB:
                 :param movie_id: integer or list of integers identifying movies
                 :return: list of movie IDs
         """
-        return NotImplementedError
+        movie_metadata = self.get_movie_metadata(movie_id)
+        keyword_movies_list = []
+        top_250 = self.imdb.get_top250_movies()
+
+        return keyword_movies_list
+
+
+
+
+
