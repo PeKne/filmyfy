@@ -3,10 +3,10 @@ import './App.css';
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {NotFound} from "./NotFound";
 import Menu from "./menu/Menu";
-import RecommendedMovies from "./movies/RecommendedMovies"
 import {createMuiTheme, MuiThemeProvider} from "@material-ui/core";
 import SignIn from "./auth/SignIn";
 import MovieDetail from "./movies/MovieDetail";
+import MovieList from "./movies/MovieList";
 
 
 export const UserContext = React.createContext({
@@ -88,7 +88,7 @@ const App = () => {
               {userInfo &&
                 <>
                 <Route exact path="/"
-                       render={props => <RecommendedMovies {...props} userInfo={userInfo}/>}/>
+                       render={props => <MovieList {...props} />}/>
 
                 <Route path="/movie/:id/" render={(props) => <MovieDetail {...props} />}/>
                 </>

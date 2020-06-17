@@ -33,10 +33,7 @@ const RegularMenu = () => {
         </Link>
       </Typography>
       <Button color="secondary">
-        <Link to={`/ride/search`} className={classes.link}>Recommended movies</Link>
-      </Button>
-      <Button color="secondary">
-        <Link to={`/ride/offer`} className={classes.link}>Offer a ride</Link>
+        <Link to={`/`} className={classes.link}>Recommended movies</Link>
       </Button>
       {userContext.userInfo &&
       <UserMenu/>
