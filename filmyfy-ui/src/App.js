@@ -6,6 +6,7 @@ import Menu from "./menu/Menu";
 import RecommendedMovies from "./movies/RecommendedMovies"
 import {createMuiTheme, MuiThemeProvider} from "@material-ui/core";
 import SignIn from "./auth/SignIn";
+import MovieDetail from "./movies/MovieDetail";
 
 
 export const UserContext = React.createContext({
@@ -42,7 +43,7 @@ const App = () => {
       })
       .then(token => {
         if (token) {
-          setUserInfo(token);
+          setUserInfo({"token": token, "username": username});
           onSuccess();
         } else {
           setUserInfo(undefined);
@@ -85,10 +86,12 @@ const App = () => {
               />
               }
               {userInfo &&
-              <>
+                <>
                 <Route exact path="/"
-                       render={props => <RecommendedMovies {...props}/>}/>
-              </>
+                       render={props => <RecommendedMovies {...props} userInfo={userInfo}/>}/>
+
+                <Route path="/movie/:id/" render={(props) => <MovieDetail {...props} />}/>
+                </>
               }
               <Route render={NotFound}/>
             </Switch>

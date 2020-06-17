@@ -3,7 +3,7 @@ import Button from "@material-ui/core/Button";
 import UserMenu from "./UserMenu";
 import React, {useContext} from "react";
 import {UserContext} from "../App";
-import {withRouter, Link} from "react-router-dom";
+import {Link, withRouter} from "react-router-dom";
 import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
@@ -12,6 +12,8 @@ const useStyles = makeStyles(theme => ({
   },
   title: {
     flexGrow: 1,
+    textDecoration: 'none',
+    color: "#000"
   },
   link: {
     textDecoration: 'none',
@@ -26,19 +28,21 @@ const RegularMenu = () => {
   return (
     <>
       <Typography className={classes.title} variant="h3" noWrap edge="start">
-        <b>Filmyfy</b>
-       </Typography>
-       <Button color="secondary">
-         <Link to={`/ride/search`} className={classes.link}>Recommended movies</Link>
-       </Button>
-       <Button color="secondary">
-         <Link to={`/ride/offer`} className={classes.link}>Offer a ride</Link>
-       </Button>
-       {userContext.userInfo &&
-       <UserMenu/>
-       }
-     </>
-   );
+        <Link to={"/"} className={classes.title}>
+          <b>Filmyfy</b>
+        </Link>
+      </Typography>
+      <Button color="secondary">
+        <Link to={`/ride/search`} className={classes.link}>Recommended movies</Link>
+      </Button>
+      <Button color="secondary">
+        <Link to={`/ride/offer`} className={classes.link}>Offer a ride</Link>
+      </Button>
+      {userContext.userInfo &&
+      <UserMenu/>
+      }
+    </>
+  );
 };
 
 export default withRouter(RegularMenu);
