@@ -49,7 +49,10 @@ const Menu = () => {
           {userContext.userInfo &&
           <>
             <Button color="secondary">
-              <Link to={`/ride/search`} className={classes.link}>Find a ride</Link>
+              <Link to={`/`} className={classes.link}>Recommendations</Link>
+            </Button>
+            <Button color="secondary">
+              <Link to={`/favourite`} className={classes.link}>My favourites</Link>
             </Button>
             <Typography>
               <b>{userContext.userInfo.username}</b>
