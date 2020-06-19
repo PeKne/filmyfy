@@ -133,9 +133,3 @@ class FilmyfyIMDB:
                     if data['poster_path'] is None else "http://image.tmdb.org/t/p/w185/"+data['poster_path'],
                     'genres':genres}
         return movie
-
-f = FilmyfyIMDB()
-z = f.find_movie("lord of the")
-y = f.find_similar_movies('122')
-x= f.find_similar_movie_by_favourite(['120','121','122'])
-print(x)
