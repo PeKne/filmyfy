@@ -76,14 +76,8 @@ def list_similar_movies(movie_id):
 # recommend movies according to user profile history
 @app.route('/api/user/<username>/recommend/', methods=['GET'])
 def recommend_by_profile(username):
-    # TODO add logic to recommendation
     ids = cloudantApi.get_user_favourite_movies(username)
-    movies = []
-    for id in ids:
-        movie_data = imdbApi.get_movie_metadata(id)
-        if movie_data:
-            movies.append(movie_data)
-    return jsonify(movies)
+    return jsonify(imdbApi.find_similar_movie_by_favourite(ids))
 
 # get user's favourite movies
 @app.route('/api/user/<username>/favourite/', methods=['GET'])
@@ -96,8 +90,14 @@ def get_favourite_movies(username):
             movies.append(movie_data)
     return jsonify(movies)
 
+# get user's favourite movies ids
+@app.route('/api/user/<username>/favourite_ids/', methods=['GET'])
+def get_favourite_ids(username):
+    return jsonify(cloudantApi.get_user_favourite_movies(username))
+
 # add movie/actor/director/category to favourites
-@app.route('/api/user/<username>/favourite/<movie_id>/', methods=['POST'])
+@app.route('/api/user/<username>/favourite/<movie_id>/', methods=['POST', 'OPTIONS'])
+@cross_origin()
 def add_to_favourites(username, movie_id):
     return jsonify(cloudantApi.add_favourite_movie(username, movie_id))
 
