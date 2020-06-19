@@ -39,6 +39,9 @@ class FilmyfyIMDB:
         data = r.json()
         genres = []
 
+        if not all(k in data for k in ['original_title', 'overview', 'genres', 'vote_average']):
+            return {}
+
         for g in data['genres']:
             genres.append(g['name'])
 
@@ -48,9 +51,8 @@ class FilmyfyIMDB:
             'plot': data["overview"],
             'genres': genres,
             'rating': data["vote_average"],
-            'poster':"http://image.tmdb.org/t/p/w185/"+ ("/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
-                    if data['poster_path'] is None else data['poster_path'])
-        }
+            'poster': "https://image.shutterstock.com/image-vector/cool-vector-web-banner-printable-260nw-257795440.jpg"
+                    if data['poster_path'] is None else "http://image.tmdb.org/t/p/w185/"+data['poster_path']}
         return result
 
     def find_movie(self, text_input):
@@ -72,16 +74,12 @@ class FilmyfyIMDB:
         result = []
 
         for d in data['results']:
+            if not all(k in d for k in ['title', 'overview', 'genre_ids', 'vote_average']):
+                return result
             genres = []
             for g in d['genre_ids']:
                 genres.append(self.genres_list[g])
-            movie ={'id':d['id'],
-                    'title': d['title'],
-                    'plot':d['overview'],
-                    'rating':d['vote_average'],
-                    'poster':"http://image.tmdb.org/t/p/w185/"+ ("/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
-                    if d['poster_path'] is None else d['poster_path']),
-                    'genres':genres}
+            movie = self.parse_movie_json(d, genres)
             result.append(movie)
         return result
 
@@ -97,48 +95,19 @@ class FilmyfyIMDB:
         url = "https://api.themoviedb.org/3/movie/"+str(movie_id)+"/similar"
         r = requests.get(url = url,params=params)
         data = r.json()
+
         result = []
 
         for d in data['results']:
+            if not all(k in d for k in ['title', 'overview', 'genre_ids', 'vote_average']):
+                return result
             genres = []
             for g in d['genre_ids']:
                 genres.append(self.genres_list[g])
-            movie ={'id':d['id'],
-                    'title': d['title'],
-                    'plot':d['overview'],
-                    'rating':d['vote_average'],
-                    'poster':"http://image.tmdb.org/t/p/w185/"+ ("/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
-                    if d['poster_path'] is None else d['poster_path']),
-                    'genres':genres}
+            movie =self.parse_movie_json(d, genres)
             result.append(movie)
 
         return result
-
-    def convert_to_tmdb_id(self, imdb_id):
-        """
-                Converts imbd id to tmbd id.
-                :param imdb_id: integer identifying movie from IMDB
-                :return: id of movie from TMDB
-        """
-        params = {'language':'en-US',
-                  'api_key':"4de51198adff202147f63d73e4963ee2",
-                  'external_source':'imdb_id'}
-
-        url = "https://api.themoviedb.org/3/find/tt"+imdb_id
-
-        r = requests.get(url = url,params=params)
-        return r.json()['movie_results'][0]['id']
-
-    def convert_to_imdb_id(self, tmdb_id):
-        """
-                Converts tmdb id to imdb id.
-                :param imdb_id: integer identifying movie from TMDB
-                :return: id of movie from IMDB
-        """
-        params = {'api_key':"4de51198adff202147f63d73e4963ee2"}
-        url = "https://api.themoviedb.org/3/movie/"+str(tmdb_id)+"/external_ids"
-        r = requests.get(url = url,params=params)
-        return r.json()['imdb_id'][2:]
 
     def find_similar_movie_by_favourite(self, favourite_list_ids):
         recommended_movies_list = {}
@@ -154,3 +123,13 @@ class FilmyfyIMDB:
         for key in sorted_list[:20]:
             result.append(self.get_movie_metadata(key[0]))
         return result
+
+    def parse_movie_json(self, data, genres):
+        movie = {'id':data['id'],
+                    'title': data['title'],
+                    'plot':data['overview'],
+                    'rating':data['vote_average'],
+                    'poster': "https://image.shutterstock.com/image-vector/cool-vector-web-banner-printable-260nw-257795440.jpg"
+                    if data['poster_path'] is None else "http://image.tmdb.org/t/p/w185/"+data['poster_path'],
+                    'genres':genres}
+        return movie
