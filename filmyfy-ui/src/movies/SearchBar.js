@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -28,7 +28,7 @@ function SearchBar(text) {
   const [options, setOptions] = React.useState([]);
   const loading = open && options.length === 0;
 
-  React.useEffect(() => {
+  useEffect(() => {
     let active = true;
 
     if (!loading) {
@@ -36,7 +36,7 @@ function SearchBar(text) {
     }
 
     (async () => {
-      const response = await fetch('http://localhost:8000/api/movie/find/?api_key=' + encodeURIComponent());
+      const response = await fetch('http://localhost:8000/api/movie/find/Lord');
       const movies = await response.json();
 
       if (active) {
@@ -49,7 +49,7 @@ function SearchBar(text) {
     };
   }, [loading]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) {
       setOptions([]);
     }
@@ -72,7 +72,7 @@ function SearchBar(text) {
           setOpen(false);
         }}
         getOptionSelected={(option, value) => option.name === value.name}
-        getOptionLabel={(option) => option.name}
+        getOptionLabel={(option) => option.title}
         options={options}
         loading={loading}
         renderInput={(params) => (

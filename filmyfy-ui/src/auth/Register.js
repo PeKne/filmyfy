@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -13,18 +13,6 @@ import {withRouter, useHistory} from "react-router-dom";
 import {UserContext} from "../App";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://gitlab.fi.muni.cz/xkaleta2/pa165-red-team-blablacar/">
-        Filmyfy by the <b>Petr Knetl, Petr Kostka, Dominik Brazdil</b>
-      </Link>
-      {` ${new Date().getFullYear()}.`}
-    </Typography>
-  );
-}
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -47,21 +35,28 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /**
- * Component for logging in with username (email) and password.
- * Based on <a href="https://github.com/mui-org/material-ui/blob/master/docs/src/pages/getting-started/templates/sign-in/SignIn.js">this</a>.
+ * Component for creating a new user.
  */
-const SignIn = () => {
+const Register = () => {
   const classes = useStyles();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordAgain, setPasswordAgain] = useState('');
   const [error, setError] = useState(false);
+  const [match, setMatch] = useState(false);
   const userContext = useContext(UserContext);
   const history = useHistory();
 
   const onSubmit = (e) => {
     e.preventDefault();
-    userContext.login(username, password, () => setError(true), () => history.push("/"))
+    if (match && username) {
+      userContext.register(username, password, () => setError(true), () => history.push("/"))
+    }
   };
+
+  useEffect(() => {
+      setMatch(password === passwordAgain)
+  }, [password, passwordAgain]);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -71,23 +66,26 @@ const SignIn = () => {
           <LockOutlinedIcon color={"primary"}/>
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Register
         </Typography>
         <form className={classes.form}>
           <TextField
+            error={!username}
+            helperText="Username must not be empty"
             variant="outlined"
             margin="normal"
             required
             fullWidth
             id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
+            label="Username"
+            name="username"
             autoFocus
             value={username}
             onInput={e => setUsername(e.target.value)}
           />
           <TextField
+            error={!match}
+            helperText="Passwords do not match"
             variant="outlined"
             margin="normal"
             required
@@ -96,9 +94,22 @@ const SignIn = () => {
             label="Password"
             type="password"
             id="password"
-            autoComplete="current-password"
             value={password}
             onInput={e => setPassword(e.target.value)}
+          />
+          <TextField
+            error={!match}
+            helperText="Passwords do not match"
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="password_again"
+            label="Password again"
+            type="password"
+            id="password_again"
+            value={passwordAgain}
+            onInput={e => setPasswordAgain(e.target.value)}
           />
           <Button
             type="submit"
@@ -108,27 +119,18 @@ const SignIn = () => {
             className={classes.submit}
             onClick={onSubmit}
           >
-            Sign In
+            Register
           </Button>
         </form>
       </div>
-      <div>
-        Not registered yet? {" "}
-        <Link onClick={() => history.push("/register")}>
-          Register
-        </Link>
-      </div>
       {error &&
       <Alert severity="error">
-        <AlertTitle>Bad credentials</AlertTitle>
-        You have inserted incorrect combination of username and password. {error}
+        <AlertTitle>Register failed</AlertTitle>
+        The username already exists.
       </Alert>
       }
-      <Box mt={8}>
-        <Copyright />
-      </Box>
     </Container>
   );
 };
 
-export default withRouter(SignIn);
+export default withRouter(Register);

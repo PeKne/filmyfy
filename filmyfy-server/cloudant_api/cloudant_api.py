@@ -46,17 +46,17 @@ class CloudantApi:
 
         self.user_db = self.client.create_database(self.db_name, throw_on_exists=False)
 
-    def get_user(self, nickname):
+    def get_user(self, username):
         """
-        Retrieves specific user by nickname
+        Retrieves specific user by username
 
-        :param nickname: string with user's nickname
+        :param username: string with user's username
         :return:
         """
-        if nickname in self.user_db:
-            return self.user_db[nickname]
+        if username in self.user_db:
+            return self.user_db[username]
         else:
-            print('No user with nickname ', nickname, 'exists')
+            print('No user with username ', username, 'exists')
             return None
 
     def get_users(self):
@@ -67,70 +67,101 @@ class CloudantApi:
         """
         return jsonify(list(self.user_db))
 
-    def create_user(self, nickname, password):
+    def create_user(self, username, password):
         """
-        Creates a user with unique nickname and password
+        Creates a user with unique username and password
 
-        :param nickname: unique string characterizing user
+        :param username: unique string characterizing user
         :param password: password string
         :return: json with created user
         """
         data = {
-            '_id': nickname,
+            '_id': username,
             'password': password,
             'seenMovies': [],
             'favouriteMovies': []
         }
         doc = self.user_db.create_document(data)
         data['_id'] = doc['_id']
-        return jsonify(data)
+        return data
 
-    def add_seen_movie(self, nickname, movie):
-        if nickname in self.user_db:
-            user = self.user_db[nickname]
+    def delete_user(self, username):
+        """
+        Deletes a user with username
+        """
+        if username in self.user_db:
+            doc = self.user_db[username]
+            doc.delete()
+            return username
+        return []
+
+    def add_seen_movie(self, username, movie):
+        if username in self.user_db:
+            user = self.user_db[username]
             user['seenMovies'].append(movie)
             user.save()
-            return jsonify(user['seenMovies'])
+            return user['seenMovies']
         else:
-            print('No user with nickname ', nickname, 'exists')
-            return jsonify([])
+            print('No user with username ', username, 'exists')
+            return []
 
-    def get_user_seen_movies(self, nickname):
-        if nickname in self.user_db:
-            return jsonify(self.user_db[nickname]['seenMovies'])
+    def get_user_seen_movies(self, username):
+        if username in self.user_db:
+            return self.user_db[username]['seenMovies']
         else:
-            print('No user with nickname ', nickname, 'exists')
-            return jsonify([])
+            print('No user with username ', username, 'exists')
+            return []
 
-    def add_favourite_movie(self, nickname, movie):
+    def add_favourite_movie(self, username, movie_id):
         """
         Add a movie to the list of user's favourite movies
 
-        :param nickname: nickname of the user
-        :param movie: movie title
+        :param username: username of the user
+        :param movie_id: movie title
         :return: json list of movie titles
         """
-        if nickname in self.user_db:
-            user = self.user_db[nickname]
-            user['favouriteMovies'].append(movie)
+        if username in self.user_db:
+            user = self.user_db[username]
+            user['favouriteMovies'].append(movie_id)
             user.save()
-            return jsonify(user['favouriteMovies'])
+            return user['favouriteMovies']
         else:
-            print('No user with nickname ', nickname, 'exists')
-            return jsonify([])
+            print('No user with username ', username, 'exists')
+            return []
 
-    def get_user_favourite_movies(self, nickname):
+    def remove_favourite_movie(self, username, movie_id):
+        """
+        Removes a movie from the list of user's favourite movies
+
+        :param username: username of the user
+        :param movie_id: movie title
+        :return: json list of movie titles
+        """
+        if username in self.user_db:
+            user = self.user_db[username]
+            try:
+                user['favouriteMovies'].remove(movie_id)
+            except:
+                print("No such movie in favourites")
+                return []
+            user.save()
+            return user['favouriteMovies']
+        else:
+            print('No user with username ', username, 'exists')
+            return []
+
+    def get_user_favourite_movies(self, username):
         """
         Retrieves user's favourite movies
 
-        :param nickname: nickname of the user
+        :param username: username of the user
         :return: json list of movie titles
         """
-        if nickname in self.user_db:
-            return jsonify(self.user_db[nickname]['favouriteMovies'])
+        if username in self.user_db:
+            return self.user_db[username]['favouriteMovies']
         else:
-            print('No user with nickname ', nickname, 'exists')
-            return jsonify([])
+            print('No user with username ', username, 'exists')
+            return []
 
     def disconnect(self):
         if self.client:

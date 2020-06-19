@@ -43,12 +43,13 @@ class FilmyfyIMDB:
             genres.append(g['name'])
 
         result = {  # TODO: add other details we are interested in
-            "id": str(movie_id),
-            "title": data['original_title'],
-            "plot": data["overview"],
-            "genres": genres,
-            "rating": data["vote_average"],
-            'cover url':"http://image.tmdb.org/t/p/w185/"+data['poster_path']
+            'id': str(movie_id),
+            'title': data['original_title'],
+            'plot': data["overview"],
+            'genres': genres,
+            'rating': data["vote_average"],
+            'poster':"http://image.tmdb.org/t/p/w185/"+ ("/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
+                    if data['poster_path'] is None else data['poster_path'])
         }
         return result
 
@@ -78,7 +79,7 @@ class FilmyfyIMDB:
                     'title': d['title'],
                     'plot':d['overview'],
                     'rating':d['vote_average'],
-                    'cover url':"http://image.tmdb.org/t/p/w185/"+ ("/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
+                    'poster':"http://image.tmdb.org/t/p/w185/"+ ("/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
                     if d['poster_path'] is None else d['poster_path']),
                     'genres':genres}
             result.append(movie)
@@ -106,7 +107,7 @@ class FilmyfyIMDB:
                     'title': d['title'],
                     'plot':d['overview'],
                     'rating':d['vote_average'],
-                    'cover url':"http://image.tmdb.org/t/p/w185/"+ ("/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
+                    'poster':"http://image.tmdb.org/t/p/w185/"+ ("/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
                     if d['poster_path'] is None else d['poster_path']),
                     'genres':genres}
             result.append(movie)
