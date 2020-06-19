@@ -55,12 +55,7 @@ def remove_user(username):
 # find a movie by text string
 @app.route('/api/movie/find/<text>/', methods=['GET'])
 def find_movies(text):
-    ids = imdbApi.find_movie(text)
-    movies = []
-    for id in ids:
-        data = imdbApi.get_movie_metadata(id)
-        if data:
-            movies.append(data)
+    movies = imdbApi.find_movie(text)
     return jsonify(movies)
 
 # find a movie by id
