@@ -101,6 +101,21 @@ def add_to_favourites(username, movie_id):
 def remove_from_favourites(username, movie_id):
     return jsonify(cloudantApi.remove_favourite_movie(username, movie_id))
 
+# get user's seen movies
+@app.route('/api/user/<username>/seen/', methods=['GET'])
+def get_seen_movies(username):
+    ids = cloudantApi.get_user_seen_movies(username)
+    movies = []
+    for id in ids:
+        movie_data = imdbApi.get_movie_metadata(id)
+        if movie_data:
+            movies.append(movie_data)
+    return jsonify(movies)
+
+# add movie/actor/director/category to seen
+@app.route('/api/user/<username>/seen/<movie_id>/', methods=['POST'])
+def add_to_seen(username, movie_id):
+    return jsonify(cloudantApi.add_seen_movie(username, movie_id))
 
 @atexit.register
 def on_exit():
