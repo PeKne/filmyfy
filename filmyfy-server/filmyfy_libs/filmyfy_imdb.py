@@ -1,16 +1,29 @@
 from imdb import IMDb
-from imdb._exceptions import IMDbDataAccessError
 import requests
 
 class FilmyfyIMDB:
     """
-    Our base class for communication with IMDb API.
+    Our base class for communication with TMDB API.
     Main use cases: movie retrieving, filtering, getting movie metadata etc.
 
     In __init__ is initialized property `imdb` which is later used for communication with official IMDb API.
     """
     def __init__(self):
         self.imdb = IMDb(reraiseExceptions=True)
+        self.genres_list = self.init_genres()
+
+    def init_genres(self):
+        params = {'api_key':"4de51198adff202147f63d73e4963ee2",
+                  'language':'en-US',}
+
+        url = "https://api.themoviedb.org/3/genre/movie/list"
+        r = requests.get(url = url,params=params)
+        data = r.json()
+        result = {}
+        for d in data['genres']:
+            result[d['id']] = d['name']
+
+        return result
 
     def get_movie_metadata(self, movie_id):
         """
@@ -18,19 +31,24 @@ class FilmyfyIMDB:
         :param movie_id: integer identifying movie
         :return: object with movie data
         """
-        try:
-            movie = self.imdb.get_movie(str(movie_id))
-        except IMDbDataAccessError:  # unable to get movie
-            return None
+        params = {'api_key':"4de51198adff202147f63d73e4963ee2",
+                  'language':'en-US',}
+
+        url = "https://api.themoviedb.org/3/movie/"+str(movie_id)
+        r = requests.get(url = url,params=params)
+        data = r.json()
+        genres = []
+
+        for g in data['genres']:
+            genres.append(g['name'])
 
         result = {  # TODO: add other details we are interested in
             "id": str(movie_id),
-            "cast": [(c.personID, c["name"]) for c in movie["cast"]],
-            "plot": movie["plot"],
-            "genres": movie["genres"],
-            "rating": movie["rating"],
-            "cover url": movie["cover url"],
-            "keywords": self.imdb.get_movie_keywords(movie_id)['data']['keywords']
+            "title": data['original_title'],
+            "plot": data["overview"],
+            "genres": genres,
+            "rating": data["vote_average"],
+            'cover url':"http://image.tmdb.org/t/p/w185/"+data['poster_path']
         }
         return result
 
@@ -39,30 +57,61 @@ class FilmyfyIMDB:
         Finds list of movies according to text.
 
         :param text_input: result will be based on this string value
-        :return: list of movie IDs
+        :return: dictionary, where key is Id of movie with value of dictionary containing movie data
         """
+        params = {'query':text_input,
+                  'api_key':"4de51198adff202147f63d73e4963ee2",
+                  'include_adult':'false',
+                  'language':'en-US',
+                  'page':'1'}
 
-        movies = self.imdb.search_movie(text_input)
-        return [m.movieID for m in movies]
+        url = "https://api.themoviedb.org/3/search/movie"
+        r = requests.get(url = url,params=params)
+        data = r.json()
+        result = []
+
+        for d in data['results']:
+            genres = []
+            for g in d['genre_ids']:
+                genres.append(self.genres_list[g])
+            movie ={'id':d['id'],
+                    'title': d['title'],
+                    'plot':d['overview'],
+                    'rating':d['vote_average'],
+                    'cover url':"http://image.tmdb.org/t/p/w185/"+ ("/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
+                    if d['poster_path'] is None else d['poster_path']),
+                    'genres':genres}
+            result.append(movie)
+        return result
 
     def find_similar_movies(self, movie_id):
         """
                 Gets list of movie ids which are similar to the one (or more) from argument. Maximal list length is 100.
                 :param movie_id: integer or list of integers identifying movies
-                :return: list of movie IMDB IDs
+                :return: dictionary, where key is Id of movie with value of dictionary containing movie data
         """
         params = {'language':'en-US',
                   'api_key':"4de51198adff202147f63d73e4963ee2",
                   'page':'1'}
-        id = self.convert_to_tmdb_id(movie_id)
-        url = "https://api.themoviedb.org/3/movie/"+str(id)+"/similar"
+        url = "https://api.themoviedb.org/3/movie/"+str(movie_id)+"/similar"
         r = requests.get(url = url,params=params)
         data = r.json()
-        ids = []
-        for d in data['results']:
-            ids.append(self.convert_to_imdb_id(d['id']))
+        result = []
 
-        return ids
+        for d in data['results']:
+            genres = []
+            for g in d['genre_ids']:
+                genres.append(self.genres_list[g])
+            movie ={'id':d['id'],
+                    'title': d['title'],
+                    'plot':d['overview'],
+                    'rating':d['vote_average'],
+                    'cover url':"http://image.tmdb.org/t/p/w185/"+ ("/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
+                    if d['poster_path'] is None else d['poster_path']),
+                    'genres':genres}
+            result.append(movie)
+
+        return result
 
     def convert_to_tmdb_id(self, imdb_id):
         """
@@ -90,8 +139,17 @@ class FilmyfyIMDB:
         r = requests.get(url = url,params=params)
         return r.json()['imdb_id'][2:]
 
+    def find_similar_movie_by_favourite(self, favourite_list_ids):
+        recommended_movies_list = {}
+        for f_id in favourite_list_ids:
+            for d in self.find_similar_movies(f_id):
+                if d['id'] in recommended_movies_list:
+                    recommended_movies_list[d['id']] += 1
+                else:
+                    recommended_movies_list[d['id']] = 1
 
-
-
-
-
+        sorted_list = sorted(recommended_movies_list.items(), key=lambda kv: -kv[1])
+        result = []
+        for key in sorted_list[:20]:
+            result.append(self.get_movie_metadata(key[0]))
+        return result
