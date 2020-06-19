@@ -66,6 +66,7 @@ const useStyles = makeStyles((theme) => ({
 
 const MovieDetail = props => {
   const [movie, setMovie] = useState(undefined);
+  const [favourites, setFavourites] = useState([]);
   const classes = useStyles();
   const userContext = useContext(UserContext);
   const {id} = props.match.params;
@@ -79,7 +80,19 @@ const MovieDetail = props => {
         .catch((err) => {
           console.log('Error: ' + err);
         });
+      fetchFavourites();
   }, []);
+
+  const fetchFavourites = () => {
+    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/favourite_ids/')
+      .then((response) => response.json())
+      .then((data) => {
+        setFavourites(data);
+      })
+      .catch((err) => {
+        console.log('Error: ' + err);
+      });
+  };
 
   const addFavourite = () => {
     fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/favourite/' + id + '/', {method: 'POST'})
@@ -118,11 +131,13 @@ const MovieDetail = props => {
           <typography className={classes.genres}> {movie.genres.join(" / ")} </typography>
           <typography className={classes.plot}> {movie.plot} </typography>
           <Grid item xs={4}>
-            <Tooltip title="Add to favourites" aria-label="add" placement="right">
-              <IconButton aria-label="delete" className={classes.icon} onClick={addFavourite}>
-                <AddCircleOutline fontSize="large" className={classes.addButton}/>
-              </IconButton>
-            </Tooltip>
+            {!favourites.includes(id) &&
+              <Tooltip title="Add to favourites" aria-label="add" placement="right">
+                <IconButton aria-label="delete" className={classes.icon} onClick={addFavourite}>
+                  <AddCircleOutline fontSize="large" className={classes.addButton}/>
+                </IconButton>
+              </Tooltip>
+            }
           </Grid>
           <Grid item xs={8}>
           </Grid>

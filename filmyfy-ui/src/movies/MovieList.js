@@ -61,6 +61,8 @@ const MovieList = props => {
   } = props;
   const classes = useStyles();
   const [movies, setMovies] = useState([]);
+  const [favourites, setFavourites] = useState([]);
+  const [seen, setSeen] = useState([]);
   const [title, setTitle] = useState(listType === "recommend" ? "Movies for you" : "Your favourite movies");
   const userContext = useContext(UserContext);
 
@@ -78,6 +80,28 @@ const MovieList = props => {
     }
   };
 
+  const fetchFavourites = () => {
+    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/favourite_ids/')
+      .then((response) => response.json())
+      .then((data) => {
+        setFavourites(data)
+      })
+      .catch((err) => {
+        console.log('Error: ' + err);
+      });
+  };
+
+  const fetchSeen = () => {
+    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/seen_ids/')
+      .then((response) => response.json())
+      .then((data) => {
+        setSeen(data)
+      })
+      .catch((err) => {
+        console.log('Error: ' + err);
+      });
+  };
+
   useEffect(() => {
     fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/' + listType + '/')
       .then((response) => response.json())
@@ -87,6 +111,8 @@ const MovieList = props => {
       .catch((err) => {
         console.log('Error: ' + err);
       });
+    fetchFavourites();
+    fetchSeen();
   }, []);
 
   const MovieThumbnails = [];
@@ -94,7 +120,13 @@ const MovieList = props => {
   if (movies.length > 0) {
       for (let i in movies) {
           MovieThumbnails.push(
-              <MovieThumbnail key={i} movie={movies[i]}/>
+              <MovieThumbnail
+                seen={seen}
+                favourites={favourites}
+                movie={movies[i]}
+                onFavouritesChange={fetchFavourites}
+                onSeenChange={fetchSeen}
+              />
           );
       }
   }
