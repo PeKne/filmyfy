@@ -52,7 +52,7 @@ class FilmyfyIMDB:
             'genres': genres,
             'rating': data["vote_average"],
             'poster': "https://image.shutterstock.com/image-vector/cool-vector-web-banner-printable-260nw-257795440.jpg"
-            if data['poster_path'] is None else "http://image.tmdb.org/t/p/w185/" + data['poster_path']}
+                    if data['poster_path'] is None else "http://image.tmdb.org/t/p/w185/"+data['poster_path']}
         return result
 
     def find_movie(self, text_input):
@@ -109,7 +109,7 @@ class FilmyfyIMDB:
 
         return result
 
-    def find_similar_movie_by_favourite(self, favourite_list_ids):
+    def find_similar_movie_by_favourite(self, favourite_list_ids, seen_list_ids):
         recommended_movies_list = {}
         for f_id in favourite_list_ids:
             for d in self.find_similar_movies(f_id):
@@ -120,8 +120,18 @@ class FilmyfyIMDB:
 
         sorted_list = sorted(recommended_movies_list.items(), key=lambda kv: -kv[1])
         result = []
-        for key in sorted_list[:20]:
-            result.append(self.get_movie_metadata(key[0]))
+        counter = 0
+        print(favourite_list_ids)
+        for key in sorted_list:
+            print(key[0])
+            if counter >= 20:
+                return result
+            if str(key[0]) in favourite_list_ids or str(key[0]) in seen_list_ids:
+                continue
+            else:
+                counter +=1
+                result.append(self.get_movie_metadata(key[0]))
+
         return result
 
     def parse_movie_json(self, data, genres):
