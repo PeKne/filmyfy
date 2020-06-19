@@ -81,7 +81,17 @@ def recommend_by_profile(username):
     ids = cloudantApi.get_user_favourite_movies(username)
     movies = []
     for id in ids:
-        print(datetime.now())
+        movie_data = imdbApi.get_movie_metadata(id)
+        if movie_data:
+            movies.append(movie_data)
+    return jsonify(movies)
+
+# get user's favourite movies
+@app.route('/api/user/<username>/favourite/', methods=['GET'])
+def get_favourite_movies(username):
+    ids = cloudantApi.get_user_favourite_movies(username)
+    movies = []
+    for id in ids:
         movie_data = imdbApi.get_movie_metadata(id)
         if movie_data:
             movies.append(movie_data)

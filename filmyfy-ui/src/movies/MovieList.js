@@ -1,173 +1,98 @@
 import React, {useEffect, useState, useContext} from "react";
 import {withRouter} from "react-router-dom";
 import MovieThumbnail from './MovieThumbnail';
-import SearchBar from './SearchBar';
 import Grid from '@material-ui/core/Grid';
 import {makeStyles} from "@material-ui/core/styles";
 import {UserContext} from "../App";
+import {fade} from "@material-ui/core/styles/index";
+import InputBase from "@material-ui/core/es/InputBase/InputBase";
+import SearchIcon from '@material-ui/icons/Search';
 
 const useStyles = makeStyles((theme) => ({
   wrapper: {
     width: "80%",
     margin: "0 auto",
     textAlign: "left",
-  }
+  },
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(1),
+      width: 'auto',
+    },
+  },
+  searchIcon: {
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+  },
+  inputInput: {
+    padding: theme.spacing(1, 3, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: theme.spacing(6),
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      width: '22ch',
+      '&:focus': {
+        width: '25ch',
+      },
+    },
+  },
 }));
 
-const MovieList = (userInfo) => {
+const MovieList = props => {
+  const {
+    listType
+  } = props;
   const classes = useStyles();
   const [movies, setMovies] = useState([]);
+  const [title, setTitle] = useState(listType === "recommend" ? "Movies for you" : "Your favourite movies");
+
+
   const userContext = useContext(UserContext);
+
+  const onSubmit = (e) => {
+    if (e.key === 'Enter') {
+      fetch('http://localhost:8000/api/movie/find/' + e.target.value + '/')
+        .then((response) => response.json())
+        .then((data) => {
+          setTitle("Search result");
+          setMovies(data);
+        })
+        .catch((err) => {
+          console.log('Error: ' + err);
+        });
+    }
+  };
 
 
   useEffect(() => {
-        const fetchData = async () => {
-          fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/recommend/')
-              .then((response) => response.json())
-              .then((data) => {
-                  setMovies(
-                      data.map((m) => ({
-                          id: m.id,
-                          title: m.title,
-                          genres: m.genres,
-                          poster: m.poster,
-                          rating: m.rating,
-                      }))
-                  );
-              })
-              .catch((err) => {
-                  console.log('Error: ' + err);
-              });
-          // setMovies([{
-          //   id: 1,
-          //   title: "The Lord of The Rings",
-          //   rating: 92,
-          //   poster: "https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_SY999_CR0,0,673,999_AL_.jpg",
-          //   genres: ["Fantasy", "Drama"]
-          // },
-          //   {
-          //     id: 1,
-          //     title: "Shawshank Redemption",
-          //     rating: 86,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
-          //     genres: ["Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "Pulp Fiction",
-          //     rating: 92,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,686,1000_AL_.jpg",
-          //     genres: ["Crime", "Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "The Lord of The Rings",
-          //     rating: 92,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_SY999_CR0,0,673,999_AL_.jpg",
-          //     genres: ["Fantasy", "Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "Shawshank Redemption",
-          //     rating: 86,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
-          //     genres: ["Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "Pulp Fiction",
-          //     rating: 92,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,686,1000_AL_.jpg",
-          //     genres: ["Crime", "Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "The Lord of The Rings",
-          //     rating: 92,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_SY999_CR0,0,673,999_AL_.jpg",
-          //     genres: ["Fantasy", "Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "Shawshank Redemption",
-          //     rating: 86,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
-          //     genres: ["Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "Pulp Fiction",
-          //     rating: 92,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,686,1000_AL_.jpg",
-          //     genres: ["Crime", "Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "The Lord of The Rings",
-          //     rating: 92,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_SY999_CR0,0,673,999_AL_.jpg",
-          //     genres: ["Fantasy", "Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "Shawshank Redemption",
-          //     rating: 86,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
-          //     genres: ["Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "Pulp Fiction",
-          //     rating: 92,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,686,1000_AL_.jpg",
-          //     genres: ["Crime", "Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "The Lord of The Rings",
-          //     rating: 92,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_SY999_CR0,0,673,999_AL_.jpg",
-          //     genres: ["Fantasy", "Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "Shawshank Redemption",
-          //     rating: 86,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
-          //     genres: ["Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "Pulp Fiction",
-          //     rating: 92,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,686,1000_AL_.jpg",
-          //     genres: ["Crime", "Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "The Lord of The Rings",
-          //     rating: 92,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_SY999_CR0,0,673,999_AL_.jpg",
-          //     genres: ["Fantasy", "Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "Shawshank Redemption",
-          //     rating: 86,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
-          //     genres: ["Drama"]
-          //   },
-          //   {
-          //     id: 1,
-          //     title: "Pulp Fiction",
-          //     rating: 92,
-          //     poster: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,686,1000_AL_.jpg",
-          //     genres: ["Crime", "Drama"]
-          //   },
-          // ]);
-        };
-          fetchData();
-        }, []);
+    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/' + listType + '/')
+      .then((response) => response.json())
+      .then((data) => {
+        setTitle("Movies for you");
+        setMovies(data);
+      })
+      .catch((err) => {
+        console.log('Error: ' + err);
+      });
+  });
+
 
 
   const MovieThumbnails = [];
@@ -184,16 +109,26 @@ const MovieList = (userInfo) => {
 
   return (
     <div className={classes.wrapper}>
-      <h1>Movies for you:</h1>
-      {(movies.length > 0) && <SearchBar text="Haven't found what are you looking for? Search our database:"/>}
-      {(movies.length <= 0) && <SearchBar text="To show your recommended movies, please add some to your favourites:"/>}
+      <div className={classes.search}>
+        <div className={classes.searchIcon}>
+          <SearchIcon />
+        </div>
+        <div className={classes.inputInput}>
+          <InputBase
+            placeholder="Search…"
+            inputProps={{ 'aria-label': 'search' }}
+            onKeyDown={(e) => onSubmit(e)}
+          />
+        </div>
+      </div>
+
+      <h1>{title}</h1>
       <Grid
             container
             direction="row"
             justify="center"
             alignItems="center"
       >
-
         {MovieThumbnails}
       </Grid>
     </div>

@@ -61,6 +61,8 @@ const useStyles = makeStyles(() => ({
 function MovieThumbnail({movie}) {
   const mediaStyles = useCoverCardMediaStyles({bgPosition: 'top'});
   const classes = useStyles();
+
+
   return (
     <Link to={"/movie/" + movie.id + "/"} className={classes.wrapper}>
       <Card className={classes.card}>
