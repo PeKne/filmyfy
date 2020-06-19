@@ -85,13 +85,12 @@ const MovieList = props => {
     fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/' + listType + '/')
       .then((response) => response.json())
       .then((data) => {
-        setTitle("Movies for you");
         setMovies(data);
       })
       .catch((err) => {
         console.log('Error: ' + err);
       });
-  });
+  }, []);
 
 
 
