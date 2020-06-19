@@ -39,6 +39,9 @@ class FilmyfyIMDB:
         data = r.json()
         genres = []
 
+        if not all(k in data for k in ['original_title', 'overview', 'genres', 'vote_average']):
+            return {}
+
         for g in data['genres']:
             genres.append(g['name'])
 
@@ -71,6 +74,8 @@ class FilmyfyIMDB:
         result = []
 
         for d in data['results']:
+            if not all(k in d for k in ['title', 'overview', 'genre_ids', 'vote_average']):
+                return result
             genres = []
             for g in d['genre_ids']:
                 genres.append(self.genres_list[g])
@@ -90,9 +95,12 @@ class FilmyfyIMDB:
         url = "https://api.themoviedb.org/3/movie/"+str(movie_id)+"/similar"
         r = requests.get(url = url,params=params)
         data = r.json()
+
         result = []
 
         for d in data['results']:
+            if not all(k in d for k in ['title', 'overview', 'genre_ids', 'vote_average']):
+                return result
             genres = []
             for g in d['genre_ids']:
                 genres.append(self.genres_list[g])
@@ -127,5 +135,7 @@ class FilmyfyIMDB:
         return movie
 
 f = FilmyfyIMDB()
-x= f.find_movie("Lord")
+z = f.find_movie("lord of the")
+y = f.find_similar_movies('122')
+x= f.find_similar_movie_by_favourite(['120','121','122'])
 print(x)
