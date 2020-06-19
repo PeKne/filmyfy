@@ -9,6 +9,7 @@ import {useCoverCardMediaStyles} from '@mui-treasury/styles/cardMedia/cover';
 import {AddCircleOutline} from "@material-ui/icons";
 import {Link} from "react-router-dom";
 import IconButton from "@material-ui/core/IconButton";
+import CheckIcon from '@material-ui/icons/Check';
 import Tooltip from "@material-ui/core/Tooltip/Tooltip";
 import {UserContext} from "../App";
 
@@ -59,22 +60,10 @@ const useStyles = makeStyles(() => ({
 }));
 
 
-function MovieThumbnail({movie}) {
+function MovieThumbnail({seen, favourites, movie, onFavouritesChange, onSeenChange}) {
   const mediaStyles = useCoverCardMediaStyles({bgPosition: 'top'});
-  const [favourites, setFavourites] = useState([]);
   const classes = useStyles();
   const userContext = useContext(UserContext);
-
-  useEffect(() => {
-    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + 'favourite_ids/')
-      .then((response) => response.json())
-      .then((data) => {
-        setFavourites(data);
-      })
-      .catch((err) => {
-        console.log('Error: ' + err);
-      });
-  }, []);
 
   const addFavourite = () => {
     fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/favourite/' + movie.id + '/', {method: 'POST'})
@@ -85,6 +74,19 @@ function MovieThumbnail({movie}) {
           throw error;
         }
       });
+    onFavouritesChange();
+  };
+
+  const addSeen = () => {
+    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/seen/' + movie.id + '/', {method: 'POST'})
+      .then((response) => {
+        if (!response.ok) {
+          const error = new Error();
+          error.message = `Error adding movie to seen`;
+          throw error;
+        }
+      });
+    onSeenChange();
   };
 
   return (
@@ -103,11 +105,20 @@ function MovieThumbnail({movie}) {
             </InfoCaption>
           </Info>
         </Box>
-        <Tooltip title="Add to favourites" aria-label="add" placement="right">
+        {!favourites.includes(movie.id) &&
+          <Tooltip title="Add to favourites" aria-label="add" placement="right">
             <IconButton aria-label="delete" className={classes.icon} onClick={addFavourite}>
-              <AddCircleOutline fontSize="large" className={classes.addButton} />
+              <AddCircleOutline fontSize="large" className={classes.addButton}/>
             </IconButton>
+          </Tooltip>
+        }
+        {!seen.includes(movie.id) &&
+        <Tooltip title="Mark as seen" aria-label="add" placement="right">
+          <IconButton aria-label="delete" className={classes.icon} onClick={addSeen}>
+            <CheckIcon fontSize="large" className={classes.addButton}/>
+          </IconButton>
         </Tooltip>
+        }
       </Card>
     </Link>
   )
