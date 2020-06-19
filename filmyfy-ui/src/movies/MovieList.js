@@ -62,8 +62,6 @@ const MovieList = props => {
   const classes = useStyles();
   const [movies, setMovies] = useState([]);
   const [title, setTitle] = useState(listType === "recommend" ? "Movies for you" : "Your favourite movies");
-
-
   const userContext = useContext(UserContext);
 
   const onSubmit = (e) => {
@@ -80,7 +78,6 @@ const MovieList = props => {
     }
   };
 
-
   useEffect(() => {
     fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/' + listType + '/')
       .then((response) => response.json())
@@ -92,10 +89,7 @@ const MovieList = props => {
       });
   }, []);
 
-
-
   const MovieThumbnails = [];
-
 
   if (movies.length > 0) {
       for (let i in movies) {
@@ -104,7 +98,6 @@ const MovieList = props => {
           );
       }
   }
-
 
   return (
     <div className={classes.wrapper}>

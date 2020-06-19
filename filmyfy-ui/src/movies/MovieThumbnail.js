@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Card from '@material-ui/core/Card';
 import Box from '@material-ui/core/Box';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -10,6 +10,7 @@ import {AddCircleOutline} from "@material-ui/icons";
 import {Link} from "react-router-dom";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip/Tooltip";
+import {UserContext} from "../App";
 
 
 const useStyles = makeStyles(() => ({
@@ -60,8 +61,31 @@ const useStyles = makeStyles(() => ({
 
 function MovieThumbnail({movie}) {
   const mediaStyles = useCoverCardMediaStyles({bgPosition: 'top'});
+  const [favourites, setFavourites] = useState([]);
   const classes = useStyles();
+  const userContext = useContext(UserContext);
 
+  useEffect(() => {
+    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + 'favourite_ids/')
+      .then((response) => response.json())
+      .then((data) => {
+        setFavourites(data);
+      })
+      .catch((err) => {
+        console.log('Error: ' + err);
+      });
+  }, []);
+
+  const addFavourite = () => {
+    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/favourite/' + movie.id + '/', {method: 'POST'})
+      .then((response) => {
+        if (!response.ok) {
+          const error = new Error();
+          error.message = `Error adding movie to favourites`;
+          throw error;
+        }
+      });
+  };
 
   return (
     <Link to={"/movie/" + movie.id + "/"} className={classes.wrapper}>
@@ -73,14 +97,14 @@ function MovieThumbnail({movie}) {
         <Box py={3} px={2} className={classes.content}>
           <Info useStyles={useGalaxyInfoStyles}>
             <InfoTitle>{movie.title}</InfoTitle>
-            <InfoSubtitle>{movie.rating}%</InfoSubtitle>
+            <InfoSubtitle>{movie.rating}</InfoSubtitle>
             <InfoCaption> {
               movie.genres.slice(0, 3).join(" / ")}
             </InfoCaption>
           </Info>
         </Box>
         <Tooltip title="Add to favourites" aria-label="add" placement="right">
-            <IconButton aria-label="delete" className={classes.icon}>
+            <IconButton aria-label="delete" className={classes.icon} onClick={addFavourite}>
               <AddCircleOutline fontSize="large" className={classes.addButton} />
             </IconButton>
         </Tooltip>

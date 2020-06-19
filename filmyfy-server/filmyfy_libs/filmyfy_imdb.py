@@ -52,7 +52,7 @@ class FilmyfyIMDB:
             'genres': genres,
             'rating': data["vote_average"],
             'poster': "https://image.shutterstock.com/image-vector/cool-vector-web-banner-printable-260nw-257795440.jpg"
-                    if data['poster_path'] is None else "http://image.tmdb.org/t/p/w185/"+data['poster_path']}
+            if data['poster_path'] is None else "http://image.tmdb.org/t/p/w185/" + data['poster_path']}
         return result
 
     def find_movie(self, text_input):
