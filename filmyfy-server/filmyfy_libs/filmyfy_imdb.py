@@ -1,6 +1,6 @@
 from imdb import IMDb
 import requests
-import time
+
 class FilmyfyIMDB:
     """
     Our base class for communication with TMDB API.
