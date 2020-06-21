@@ -13,6 +13,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import Tooltip from "@material-ui/core/Tooltip/Tooltip";
 import {UserContext} from "../App";
 import CardActions from "@material-ui/core/es/CardActions/CardActions";
+import RemoveCircleOutline from "@material-ui/icons/esm/RemoveCircleOutline";
 
 
 const useStyles = makeStyles(() => ({
@@ -58,14 +59,14 @@ const useStyles = makeStyles(() => ({
       color: "#9ce654",
     }
   },
-  seenIcon: {
+  removeIcon: {
     zIndex: 3,
-    position: "relative",
     display: "block",
+    position: "relative",
     padding: 0,
-    color: "#72bb53",
+    color: "#F0861C",
     '&:hover': {
-      color: "#9ce654",
+      color: "#FCA651",
     }
   },
 
@@ -90,6 +91,18 @@ function MovieThumbnail({isSeen, isFavourite, movie}) {
       });
     setFavourite(true);
     setSeen(true);
+  };
+
+  const removeFavourite = () => {
+    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/favourite/' + movie.id + '/', {method: 'DELETE'})
+      .then((response) => {
+        if (!response.ok) {
+          const error = new Error();
+          error.message = `Error removing movie from favourites`;
+          throw error;
+        }
+      });
+    setFavourite(false);
   };
 
   const addSeen = () => {
@@ -128,9 +141,16 @@ function MovieThumbnail({isSeen, isFavourite, movie}) {
               </IconButton>
             </Tooltip>
           }
+          {favourite &&
+          <Tooltip title="Remove from favourites" aria-label="add" placement="right">
+            <IconButton aria-label="delete" className={classes.removeIcon} onClick={removeFavourite}>
+              <RemoveCircleOutline fontSize="large"/>
+            </IconButton>
+          </Tooltip>
+          }
           {!seen &&
           <Tooltip title="Mark as seen" aria-label="add" placement="right">
-            <IconButton aria-label="delete" className={classes.seenIcon} onClick={addSeen}>
+            <IconButton aria-label="delete" className={classes.addIcon} onClick={addSeen}>
               <CheckIcon fontSize="large"/>
             </IconButton>
           </Tooltip>

@@ -8,6 +8,7 @@ import IconButton from "@material-ui/core/IconButton";
 import CheckIcon from '@material-ui/icons/Check';
 import Tooltip from "@material-ui/core/Tooltip";
 import {UserContext} from "../App";
+import RemoveCircleOutline from "@material-ui/icons/esm/RemoveCircleOutline";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -58,6 +59,8 @@ const MovieDetail = props => {
   const [movie, setMovie] = useState(undefined);
   const [favourites, setFavourites] = useState([]);
   const [seen, setSeen] = useState([]);
+  const [isFavourite, setIsFavorite] = useState(false);
+  const [isSeen, setIsSeen] = useState(false);
   const classes = useStyles();
   const userContext = useContext(UserContext);
   const {id} = props.match.params;
@@ -80,6 +83,7 @@ const MovieDetail = props => {
       .then((response) => response.json())
       .then((data) => {
         setFavourites(data);
+        setIsFavorite(data.includes(id));
       })
       .catch((err) => {
         console.log('Error: ' + err);
@@ -90,7 +94,8 @@ const MovieDetail = props => {
     fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/seen_ids/')
       .then((response) => response.json())
       .then((data) => {
-        setSeen(data)
+        setSeen(data);
+        setIsSeen(data.includes(id));
       })
       .catch((err) => {
         console.log('Error: ' + err);
@@ -106,8 +111,20 @@ const MovieDetail = props => {
           throw error;
         }
       });
-    favourites.push(id);
-    seen.push(id);
+    setIsFavorite(true);
+    setIsSeen(true);
+  };
+
+  const removeFavourite = () => {
+    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/favourite/' + movie.id + '/', {method: 'DELETE'})
+      .then((response) => {
+        if (!response.ok) {
+          const error = new Error();
+          error.message = `Error removing movie from favourites`;
+          throw error;
+        }
+      });
+    setIsFavorite(false);
   };
 
   const addSeen = () => {
@@ -119,7 +136,7 @@ const MovieDetail = props => {
           throw error;
         }
       });
-    seen.push(id);
+    setIsSeen(true);
   };
 
   return (
@@ -149,16 +166,23 @@ const MovieDetail = props => {
           <h2 typography className={classes.year}> {movie.year} </h2>
           <typography className={classes.plot}> {movie.plot} </typography>
           <Grid item xs={4}>
-            {!favourites.includes(id) &&
+            {!isFavourite &&
               <Tooltip title="Add to favourites" aria-label="add" placement="right">
-                <IconButton aria-label="delete" className={classes.icon} onClick={addFavourite}>
+                <IconButton aria-label="delete" className={classes.addIcon} onClick={addFavourite}>
                   <AddCircleOutline fontSize="large"/>
                 </IconButton>
               </Tooltip>
             }
-            {!seen.includes(id) &&
+            {isFavourite &&
+            <Tooltip title="Remove from favourites" aria-label="add" placement="right">
+              <IconButton aria-label="delete" className={classes.removeIcon} onClick={removeFavourite}>
+                <RemoveCircleOutline fontSize="large"/>
+              </IconButton>
+            </Tooltip>
+            }
+            {!isSeen &&
             <Tooltip title="Mark as seen" aria-label="add" placement="right">
-              <IconButton aria-label="delete" className={classes.icon} onClick={addSeen}>
+              <IconButton aria-label="delete" className={classes.addIcon} onClick={addSeen}>
                 <CheckIcon fontSize="large"/>
               </IconButton>
             </Tooltip>

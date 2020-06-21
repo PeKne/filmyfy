@@ -7,7 +7,9 @@ import {UserContext} from "../App";
 import {fade} from "@material-ui/core/styles/index";
 import InputBase from "@material-ui/core/es/InputBase/InputBase";
 import SearchIcon from '@material-ui/icons/Search';
+import ClearIcon from '@material-ui/icons/Clear';
 import Loader from "../Loader";
+import IconButton from "@material-ui/core/es/IconButton/IconButton";
 
 const useStyles = makeStyles((theme) => ({
   wrapper: {
@@ -35,8 +37,13 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  clearIcon: {
+    padding: 0,
+  },
   inputInput: {
     padding: theme.spacing(1, 3, 1, 0),
+    display: 'inline-flex',
+    flexDirection: 'row',
     paddingLeft: theme.spacing(6),
     width: '100%',
   },
@@ -51,6 +58,7 @@ const MovieList = props => {
   const [favourites, setFavourites] = useState([]);
   const [seen, setSeen] = useState([]);
   const [title, setTitle] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(false);
   const userContext = useContext(UserContext);
   const {
@@ -145,10 +153,19 @@ const MovieList = props => {
         </div>
         <div className={classes.inputInput}>
           <InputBase className={classes.inputField}
-            placeholder="Search…"
+            placeholder="Search in movie database"
+            value={searchText}
+            onChange={(e) =>{setSearchText(e.target.value)}}
             onKeyDown={(e) => onSearch(e)}
           />
+          <IconButton className={classes.clearIcon} onClick={() => {
+            setSearchText("");
+            fetchRecommended();
+          }}>
+            <ClearIcon />
+          </IconButton>
         </div>
+
       </div>
 
       <h1>{title}</h1>
