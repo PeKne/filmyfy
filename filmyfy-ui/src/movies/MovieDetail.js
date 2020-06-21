@@ -146,6 +146,7 @@ const MovieDetail = props => {
         <Grid item xs={8} className={classes.metadataWrapper}>
           <h1 className={classes.title}> {movie.title} <span className={classes.rating}>{movie.rating}</span></h1>
           <typography className={classes.genres}> {movie.genres.join(" / ")} </typography>
+          <h2 typography className={classes.year}> {movie.year} </h2>
           <typography className={classes.plot}> {movie.plot} </typography>
           <Grid item xs={4}>
             {!favourites.includes(id) &&

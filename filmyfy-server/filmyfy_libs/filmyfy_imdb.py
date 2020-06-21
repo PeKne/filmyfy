@@ -1,8 +1,6 @@
-from datetime import datetime
-
 from imdb import IMDb
 import requests
-import time
+
 class FilmyfyIMDB:
     """
     Our base class for communication with TMDB API.
@@ -54,6 +52,7 @@ class FilmyfyIMDB:
             'plot': data["overview"],
             'genres': genres,
             'rating': data["vote_average"],
+            'year': data['release_date'][:4],
             'poster': "https://image.shutterstock.com/image-vector/cool-vector-web-banner-printable-260nw-257795440.jpg"
                     if data['poster_path'] is None else "http://image.tmdb.org/t/p/w185/"+data['poster_path']}
         return result
@@ -128,12 +127,13 @@ class FilmyfyIMDB:
 
         for key in sorted_list:
             if counter >= 20:
-                return result
+                break
             if str(key[0]) in favourite_list_ids or str(key[0]) in seen_list_ids:
                 continue
             else:
                 counter +=1
                 result.append(key[1])
+        result = sorted(result, key=lambda kv: -kv['rating'])
         return result
 
 
@@ -143,6 +143,7 @@ class FilmyfyIMDB:
                     'title': data['title'],
                     'plot':data['overview'],
                     'rating':data['vote_average'],
+                    'year': data['release_date'][:4],
                     'poster': "https://image.shutterstock.com/image-vector/cool-vector-web-banner-printable-260nw-257795440.jpg"
                     if data['poster_path'] is None else "http://image.tmdb.org/t/p/w185/"+data['poster_path'],
                     'genres':genres}
