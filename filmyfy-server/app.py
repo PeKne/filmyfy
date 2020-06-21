@@ -95,6 +95,7 @@ def get_favourite_ids(username):
 @app.route('/api/user/<username>/favourite/<movie_id>/', methods=['POST', 'OPTIONS'])
 @cross_origin()
 def add_to_favourites(username, movie_id):
+    cloudantApi.add_seen_movie(username, movie_id)
     return jsonify(cloudantApi.add_favourite_movie(username, movie_id))
 
 # remove movie/actor/director/category from favourites

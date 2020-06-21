@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useContext} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {withRouter} from "react-router-dom";
 import MovieThumbnail from './MovieThumbnail';
 import Grid from '@material-ui/core/Grid';
@@ -7,6 +7,7 @@ import {UserContext} from "../App";
 import {fade} from "@material-ui/core/styles/index";
 import InputBase from "@material-ui/core/es/InputBase/InputBase";
 import SearchIcon from '@material-ui/icons/Search';
+import Loader from "../Loader";
 
 const useStyles = makeStyles((theme) => ({
   wrapper: {
@@ -17,16 +18,13 @@ const useStyles = makeStyles((theme) => ({
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: fade(theme.palette.common.white, 0.15),
+    backgroundColor: "#9B9B9B",
     '&:hover': {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
+      backgroundColor: fade("#9B9B9B", 0.40),
     },
     marginLeft: 0,
+    marginTop: 20,
     width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: 'auto',
-    },
   },
   searchIcon: {
     padding: theme.spacing(0, 2),
@@ -37,47 +35,50 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  inputRoot: {
-    color: 'inherit',
-  },
   inputInput: {
     padding: theme.spacing(1, 3, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: theme.spacing(6),
-    transition: theme.transitions.create('width'),
     width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      width: '22ch',
-      '&:focus': {
-        width: '25ch',
-      },
-    },
   },
+  inputField: {
+    width: '100%'
+  }
 }));
 
 const MovieList = props => {
-  const {
-    listType
-  } = props;
   const classes = useStyles();
   const [movies, setMovies] = useState([]);
   const [favourites, setFavourites] = useState([]);
   const [seen, setSeen] = useState([]);
-  const [title, setTitle] = useState(listType === "recommend" ? "Movies for you" : "Your favourite movies");
+  const [title, setTitle] = useState("");
+  const [loading, setLoading] = useState(false);
   const userContext = useContext(UserContext);
+  const {
+    listType
+  } = props;
 
-  const onSubmit = (e) => {
+  const onSearch = (e) => {
     if (e.key === 'Enter') {
-      fetch('http://localhost:8000/api/movie/find/' + e.target.value + '/')
-        .then((response) => response.json())
-        .then((data) => {
-          setTitle("Search result");
-          setMovies(data);
-        })
-        .catch((err) => {
-          console.log('Error: ' + err);
-        });
+      if (e.target.value) {
+        fetchSearch(e);
+      } else {
+        fetchRecommended();
+      }
     }
+  };
+
+  const fetchSearch = (e) => {
+    setLoading(true);
+    fetch('http://localhost:8000/api/movie/find/' + e.target.value + '/')
+      .then((response) => response.json())
+      .then((data) => {
+        setTitle("Search result");
+        setMovies(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log('Error: ' + err);
+      });
   };
 
   const fetchFavourites = () => {
@@ -102,15 +103,22 @@ const MovieList = props => {
       });
   };
 
-  useEffect(() => {
+  const fetchRecommended = () => {
+    setLoading(true);
     fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/' + listType + '/')
       .then((response) => response.json())
       .then((data) => {
         setMovies(data);
+        setTitle(listType === "recommend" ? "Movies for you" : "Your favourite movies");
+        setLoading(false);
       })
       .catch((err) => {
         console.log('Error: ' + err);
       });
+  };
+
+  useEffect(() => {
+    fetchRecommended();
     fetchFavourites();
     fetchSeen();
   }, []);
@@ -121,11 +129,9 @@ const MovieList = props => {
       for (let i in movies) {
           MovieThumbnails.push(
               <MovieThumbnail
-                seen={seen}
-                favourites={favourites}
+                isSeen={seen.includes(movies[i].id)}
+                isFavourite={favourites.includes(movies[i].id)}
                 movie={movies[i]}
-                onFavouritesChange={fetchFavourites}
-                onSeenChange={fetchSeen}
               />
           );
       }
@@ -138,23 +144,27 @@ const MovieList = props => {
           <SearchIcon />
         </div>
         <div className={classes.inputInput}>
-          <InputBase
+          <InputBase className={classes.inputField}
             placeholder="Search…"
-            inputProps={{ 'aria-label': 'search' }}
-            onKeyDown={(e) => onSubmit(e)}
+            onKeyDown={(e) => onSearch(e)}
           />
         </div>
       </div>
 
       <h1>{title}</h1>
+      {loading &&
+        <Loader />
+      }
+      {!loading &&
       <Grid
-            container
-            direction="row"
-            justify="center"
-            alignItems="center"
+        container
+        direction="row"
+        justify="center"
+        alignItems="center"
       >
         {MovieThumbnails}
       </Grid>
+      }
     </div>
   );
 };

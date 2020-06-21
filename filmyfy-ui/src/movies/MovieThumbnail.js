@@ -12,6 +12,7 @@ import IconButton from "@material-ui/core/IconButton";
 import CheckIcon from '@material-ui/icons/Check';
 import Tooltip from "@material-ui/core/Tooltip/Tooltip";
 import {UserContext} from "../App";
+import CardActions from "@material-ui/core/es/CardActions/CardActions";
 
 
 const useStyles = makeStyles(() => ({
@@ -47,7 +48,7 @@ const useStyles = makeStyles(() => ({
     bottom: 0,
     textAlign: "left",
   },
-  icon: {
+  addIcon: {
     zIndex: 3,
     display: "block",
     position: "relative",
@@ -56,13 +57,26 @@ const useStyles = makeStyles(() => ({
     '&:hover': {
       color: "#9ce654",
     }
-  }
+  },
+  seenIcon: {
+    zIndex: 3,
+    position: "relative",
+    display: "block",
+    padding: 0,
+    color: "#72bb53",
+    '&:hover': {
+      color: "#9ce654",
+    }
+  },
+
 }));
 
 
-function MovieThumbnail({seen, favourites, movie, onFavouritesChange, onSeenChange}) {
+function MovieThumbnail({isSeen, isFavourite, movie}) {
   const mediaStyles = useCoverCardMediaStyles({bgPosition: 'top'});
   const classes = useStyles();
+  const [seen, setSeen] = useState(isSeen);
+  const [favourite, setFavourite] = useState(isFavourite);
   const userContext = useContext(UserContext);
 
   const addFavourite = () => {
@@ -74,7 +88,8 @@ function MovieThumbnail({seen, favourites, movie, onFavouritesChange, onSeenChan
           throw error;
         }
       });
-    onFavouritesChange();
+    setFavourite(true);
+    setSeen(true);
   };
 
   const addSeen = () => {
@@ -86,7 +101,7 @@ function MovieThumbnail({seen, favourites, movie, onFavouritesChange, onSeenChan
           throw error;
         }
       });
-    onSeenChange();
+    setSeen(true);
   };
 
   return (
@@ -105,20 +120,22 @@ function MovieThumbnail({seen, favourites, movie, onFavouritesChange, onSeenChan
             </InfoCaption>
           </Info>
         </Box>
-        {!favourites.includes(movie.id) &&
-          <Tooltip title="Add to favourites" aria-label="add" placement="right">
-            <IconButton aria-label="delete" className={classes.icon} onClick={addFavourite}>
-              <AddCircleOutline fontSize="large" className={classes.addButton}/>
+        <CardActions>
+          {!favourite &&
+            <Tooltip title="Add to favourites" aria-label="add" placement="right">
+              <IconButton aria-label="delete" className={classes.addIcon} onClick={addFavourite}>
+                <AddCircleOutline fontSize="large"/>
+              </IconButton>
+            </Tooltip>
+          }
+          {!seen &&
+          <Tooltip title="Mark as seen" aria-label="add" placement="right">
+            <IconButton aria-label="delete" className={classes.seenIcon} onClick={addSeen}>
+              <CheckIcon fontSize="large"/>
             </IconButton>
           </Tooltip>
-        }
-        {!seen.includes(movie.id) &&
-        <Tooltip title="Mark as seen" aria-label="add" placement="right">
-          <IconButton aria-label="delete" className={classes.icon} onClick={addSeen}>
-            <CheckIcon fontSize="large" className={classes.addButton}/>
-          </IconButton>
-        </Tooltip>
-        }
+          }
+        </CardActions>
       </Card>
     </Link>
   )

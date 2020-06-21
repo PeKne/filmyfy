@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from imdb import IMDb
 import requests
 import time
