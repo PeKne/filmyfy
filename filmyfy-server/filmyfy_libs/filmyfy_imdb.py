@@ -52,6 +52,7 @@ class FilmyfyIMDB:
             'plot': data["overview"],
             'genres': genres,
             'rating': data["vote_average"],
+            'year': data['release_date'][:4],
             'poster': "https://image.shutterstock.com/image-vector/cool-vector-web-banner-printable-260nw-257795440.jpg"
                     if data['poster_path'] is None else "http://image.tmdb.org/t/p/w185/"+data['poster_path']}
         return result
@@ -142,6 +143,7 @@ class FilmyfyIMDB:
                     'title': data['title'],
                     'plot':data['overview'],
                     'rating':data['vote_average'],
+                    'year': data['release_date'][:4],
                     'poster': "https://image.shutterstock.com/image-vector/cool-vector-web-banner-printable-260nw-257795440.jpg"
                     if data['poster_path'] is None else "http://image.tmdb.org/t/p/w185/"+data['poster_path'],
                     'genres':genres}
