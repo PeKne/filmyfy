@@ -5,6 +5,7 @@ import Grid from "@material-ui/core/Grid";
 import CardMedia from '@material-ui/core/CardMedia';
 import {AddCircleOutline, ArrowBack} from "@material-ui/icons";
 import IconButton from "@material-ui/core/IconButton";
+import CheckIcon from '@material-ui/icons/Check';
 import Tooltip from "@material-ui/core/Tooltip";
 import {UserContext} from "../App";
 
@@ -29,17 +30,6 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: "0.3em",
     color: "#000"
   },
-
-  addButton: {
-    fontWeight: 800,
-    color: "#72bb53",
-    '&:hover': {
-      color: "#9ce654",
-    },
-    backgroundColor: "#fff",
-    borderRadius: "1em",
-  },
-
 
   poster: {
     height: 0,
@@ -67,6 +57,7 @@ const useStyles = makeStyles((theme) => ({
 const MovieDetail = props => {
   const [movie, setMovie] = useState(undefined);
   const [favourites, setFavourites] = useState([]);
+  const [seen, setSeen] = useState([]);
   const classes = useStyles();
   const userContext = useContext(UserContext);
   const {id} = props.match.params;
@@ -81,6 +72,7 @@ const MovieDetail = props => {
           console.log('Error: ' + err);
         });
       fetchFavourites();
+      fetchSeen();
   }, []);
 
   const fetchFavourites = () => {
@@ -88,6 +80,17 @@ const MovieDetail = props => {
       .then((response) => response.json())
       .then((data) => {
         setFavourites(data);
+      })
+      .catch((err) => {
+        console.log('Error: ' + err);
+      });
+  };
+
+  const fetchSeen = () => {
+    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/seen_ids/')
+      .then((response) => response.json())
+      .then((data) => {
+        setSeen(data)
       })
       .catch((err) => {
         console.log('Error: ' + err);
@@ -103,6 +106,20 @@ const MovieDetail = props => {
           throw error;
         }
       });
+    favourites.push(id);
+    seen.push(id);
+  };
+
+  const addSeen = () => {
+    fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/seen/' + id + '/', {method: 'POST'})
+      .then((response) => {
+        if (!response.ok) {
+          const error = new Error();
+          error.message = `Error adding movie to seen`;
+          throw error;
+        }
+      });
+    seen.push(id);
   };
 
   return (
@@ -134,9 +151,16 @@ const MovieDetail = props => {
             {!favourites.includes(id) &&
               <Tooltip title="Add to favourites" aria-label="add" placement="right">
                 <IconButton aria-label="delete" className={classes.icon} onClick={addFavourite}>
-                  <AddCircleOutline fontSize="large" className={classes.addButton}/>
+                  <AddCircleOutline fontSize="large"/>
                 </IconButton>
               </Tooltip>
+            }
+            {!seen.includes(id) &&
+            <Tooltip title="Mark as seen" aria-label="add" placement="right">
+              <IconButton aria-label="delete" className={classes.icon} onClick={addSeen}>
+                <CheckIcon fontSize="large"/>
+              </IconButton>
+            </Tooltip>
             }
           </Grid>
           <Grid item xs={8}>

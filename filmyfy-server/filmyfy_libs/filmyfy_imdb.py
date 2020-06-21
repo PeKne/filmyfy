@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from imdb import IMDb
 import requests
 
@@ -110,6 +112,7 @@ class FilmyfyIMDB:
         return result
 
     def find_similar_movie_by_favourite(self, favourite_list_ids, seen_list_ids):
+        print("Start", datetime.now())
         recommended_movies_list = {}
         for f_id in favourite_list_ids:
             for d in self.find_similar_movies(f_id):
@@ -119,11 +122,10 @@ class FilmyfyIMDB:
                     recommended_movies_list[d['id']] = 1
 
         sorted_list = sorted(recommended_movies_list.items(), key=lambda kv: -kv[1])
+        print("Between", datetime.now())
         result = []
         counter = 0
-        print(favourite_list_ids)
         for key in sorted_list:
-            print(key[0])
             if counter >= 20:
                 return result
             if str(key[0]) in favourite_list_ids or str(key[0]) in seen_list_ids:
@@ -131,7 +133,7 @@ class FilmyfyIMDB:
             else:
                 counter +=1
                 result.append(self.get_movie_metadata(key[0]))
-
+        print("End", datetime.now())
         return result
 
     def parse_movie_json(self, data, genres):

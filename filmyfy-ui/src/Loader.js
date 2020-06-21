@@ -4,7 +4,6 @@ import React from "react";
 /**
  * Component to be displayed while waiting for a response.
  *
- * @author Tatiana Fritzová
  */
 const Loader = () => {
   const style = {
