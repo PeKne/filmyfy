@@ -2,7 +2,7 @@ from datetime import datetime
 
 from imdb import IMDb
 import requests
-
+import time
 class FilmyfyIMDB:
     """
     Our base class for communication with TMDB API.
@@ -49,6 +49,7 @@ class FilmyfyIMDB:
 
         result = {  # TODO: add other details we are interested in
             'id': str(movie_id),
+            'favourite_count':1,
             'title': data['original_title'],
             'plot': data["overview"],
             'genres': genres,
@@ -112,19 +113,19 @@ class FilmyfyIMDB:
         return result
 
     def find_similar_movie_by_favourite(self, favourite_list_ids, seen_list_ids):
-        print("Start", datetime.now())
         recommended_movies_list = {}
+
         for f_id in favourite_list_ids:
             for d in self.find_similar_movies(f_id):
                 if d['id'] in recommended_movies_list:
-                    recommended_movies_list[d['id']] += 1
+                    recommended_movies_list[d['id']]['favourite_count'] += 1
                 else:
-                    recommended_movies_list[d['id']] = 1
+                    recommended_movies_list[d['id']] = d
 
-        sorted_list = sorted(recommended_movies_list.items(), key=lambda kv: -kv[1])
-        print("Between", datetime.now())
+        sorted_list = sorted(recommended_movies_list.items(), key=lambda kv: -kv[1]['favourite_count'])
         result = []
         counter = 0
+
         for key in sorted_list:
             if counter >= 20:
                 return result
@@ -132,12 +133,13 @@ class FilmyfyIMDB:
                 continue
             else:
                 counter +=1
-                result.append(self.get_movie_metadata(key[0]))
-        print("End", datetime.now())
+                result.append(key[1])
         return result
+
 
     def parse_movie_json(self, data, genres):
         movie = {'id':data['id'],
+                 'favourite_count':1,
                     'title': data['title'],
                     'plot':data['overview'],
                     'rating':data['vote_average'],
