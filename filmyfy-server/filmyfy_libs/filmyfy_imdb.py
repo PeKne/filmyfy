@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from imdb import IMDb
 import requests
 import time
@@ -128,12 +126,13 @@ class FilmyfyIMDB:
 
         for key in sorted_list:
             if counter >= 20:
-                return result
+                break
             if str(key[0]) in favourite_list_ids or str(key[0]) in seen_list_ids:
                 continue
             else:
                 counter +=1
                 result.append(key[1])
+        result = sorted(result, key=lambda kv: -kv['rating'])
         return result
 
 
