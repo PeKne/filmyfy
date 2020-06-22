@@ -12,6 +12,7 @@ import Loader from "../Loader";
 import IconButton from "@material-ui/core/es/IconButton/IconButton";
 import Slider from "@material-ui/core/Slider";
 import Typography from "@material-ui/core/Typography";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const useStyles = makeStyles((theme) => ({
   wrapper: {
@@ -118,6 +119,9 @@ const ratingFilterMarks = [
 const MovieList = props => {
   const classes = useStyles();
   const [movies, setMovies] = useState([]);
+  const [filteredMovies, setFilteredMovies] = useState([]);
+  const [displayedItems, setDisplayedItems] = useState([]);
+  const [last, setLast] = useState(0);
   const [favourites, setFavourites] = useState([]);
   const [seen, setSeen] = useState([]);
   const [title, setTitle] = useState("");
@@ -126,11 +130,14 @@ const MovieList = props => {
   const userContext = useContext(UserContext);
   const [yearFilter, setYearFilter] = React.useState([1900, 2020]);
   const [ratingFilter, setRatingFilter] = React.useState([0, 100]);
+
   const handleYearfilterChange = (event, newValue) => {
     setYearFilter(newValue);
+    filterMovies();
   };
   const handleRatingfilterChange = (event, newValue) => {
     setRatingFilter(newValue);
+    filterMovies();
   };
   const {
     listType
@@ -188,6 +195,7 @@ const MovieList = props => {
       .then((response) => response.json())
       .then((data) => {
         setMovies(data);
+        setFilteredMovies(data);
         setTitle(listType === "recommend" ? "Movies for you" : "Your favourite movies");
         setLoading(false);
       })
@@ -196,33 +204,32 @@ const MovieList = props => {
       });
   };
 
-  useEffect(() => {
-    fetchRecommended();
-    fetchFavourites();
-    fetchSeen();
-  }, []);
-
-  const MovieThumbnails = [];
-
-  if (movies.length > 0) {
-    const filteredMovies = movies.filter(function (el) {
+  const filterMovies = () => {
+    setDisplayedItems([]);
+    setLast(0);
+    setFilteredMovies(movies.filter(function (el) {
       let intYear = parseInt(el.year);
       return intYear <= yearFilter[1] &&
         intYear >= yearFilter[0] &&
         el.rating >= ratingFilter[0] &&
         el.rating <= ratingFilter[1];
-    });
-    debugger
-    for (let i in filteredMovies) {
-      MovieThumbnails.push(
-        <MovieThumbnail
-          isSeen={seen.includes(filteredMovies[i].id)}
-          isFavourite={favourites.includes(filteredMovies[i].id)}
-          movie={filteredMovies[i]}
-        />
-      );
-    }
-  }
+    }));
+  };
+
+  const getNextMovies = () => {
+    setDisplayedItems(displayedItems.concat(filteredMovies.slice(20*last, 20*last + 20)));
+    setLast(last+1);
+  };
+
+  useEffect(() => {
+    getNextMovies();
+  }, [filteredMovies]);
+
+  useEffect(() => {
+    fetchRecommended();
+    fetchFavourites();
+    fetchSeen();
+  }, []);
 
   return (
     <div className={classes.wrapper}>
@@ -288,14 +295,32 @@ const MovieList = props => {
       <Loader/>
       }
       {!loading &&
+      <InfiniteScroll
+        dataLength={filteredMovies.length}
+        next={getNextMovies}
+        hasMore={last*20 < filteredMovies.length}
+        loader={<h4>Loading...</h4>}
+        endMessage={
+          <p style={{textAlign: 'center'}}>
+            <b>Yay! You have seen it all</b>
+          </p>
+        }
+      >
       <Grid
         container
         direction="row"
         justify="center"
         alignItems="center"
       >
-        {MovieThumbnails}
+        {filteredMovies.map((i, index) => (
+          <MovieThumbnail
+            isSeen={seen.includes(i.id)}
+            isFavourite={favourites.includes(i.id)}
+            movie={i}
+          />
+        ))}
       </Grid>
+      </InfiniteScroll>
       }
     </div>
   );
