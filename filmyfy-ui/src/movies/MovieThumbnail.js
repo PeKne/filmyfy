@@ -7,7 +7,7 @@ import {makeStyles} from '@material-ui/core/styles';
 import {useGalaxyInfoStyles} from '@mui-treasury/styles/info/galaxy';
 import {useCoverCardMediaStyles} from '@mui-treasury/styles/cardMedia/cover';
 import {AddCircleOutline} from "@material-ui/icons";
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import IconButton from "@material-ui/core/IconButton";
 import CheckIcon from '@material-ui/icons/Check';
 import Tooltip from "@material-ui/core/Tooltip/Tooltip";
@@ -85,6 +85,7 @@ function MovieThumbnail({isSeen, isFavourite, movie}) {
   const [seen, setSeen] = useState(isSeen);
   const [favourite, setFavourite] = useState(isFavourite);
   const userContext = useContext(UserContext);
+  const history = useHistory();
 
   const addFavourite = (e) => {
     e.preventDefault();
@@ -111,7 +112,6 @@ function MovieThumbnail({isSeen, isFavourite, movie}) {
         }
       });
     setFavourite(false);
-    setSeen(false);
   };
 
   const addSeen = (e) => {

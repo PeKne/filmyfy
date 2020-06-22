@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Link, withRouter} from "react-router-dom";
+import {Link, useHistory, withRouter} from "react-router-dom";
 import {makeStyles} from '@material-ui/core/styles';
 import Grid from "@material-ui/core/Grid";
 import CardMedia from '@material-ui/core/CardMedia';
@@ -63,6 +63,7 @@ const MovieDetail = props => {
   const [isSeen, setIsSeen] = useState(false);
   const classes = useStyles();
   const userContext = useContext(UserContext);
+  const history = useHistory();
   const {id} = props.match.params;
 
   useEffect(() => {
@@ -145,7 +146,7 @@ const MovieDetail = props => {
       {movie &&
       <Grid container className={classes.wrapper}>
         <Grid item xs={2} className={classes.buttonWrapper}>
-          <Link to={"/"}>
+          <Link onClick={history.goBack}>
             <Tooltip title="Back to overview" aria-label="add" placement="right">
               <IconButton aria-label="delete" className={classes.icon}>
                 <ArrowBack fontSize="large" className={classes.returnButton}/>
