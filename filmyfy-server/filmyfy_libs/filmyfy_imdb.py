@@ -126,7 +126,7 @@ class FilmyfyIMDB:
         counter = 0
 
         for key in sorted_list:
-            if counter >= 20:
+            if counter >= 250:
                 break
             if str(key[0]) in favourite_list_ids or str(key[0]) in seen_list_ids:
                 continue

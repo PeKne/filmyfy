@@ -43,6 +43,12 @@ const useStyles = makeStyles(() => ({
       color: "grey",
     },
   },
+  actions: {
+    zIndex: 2,
+    background: 'linear-gradient(to bottom, #000, rgba(0,0,0,0))',
+    position: "relative",
+    paddingBottom: "30px",
+  },
   content: {
     position: 'absolute',
     zIndex: 2,
@@ -80,7 +86,8 @@ function MovieThumbnail({isSeen, isFavourite, movie}) {
   const [favourite, setFavourite] = useState(isFavourite);
   const userContext = useContext(UserContext);
 
-  const addFavourite = () => {
+  const addFavourite = (e) => {
+    e.preventDefault();
     fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/favourite/' + movie.id + '/', {method: 'POST'})
       .then((response) => {
         if (!response.ok) {
@@ -93,7 +100,8 @@ function MovieThumbnail({isSeen, isFavourite, movie}) {
     setSeen(true);
   };
 
-  const removeFavourite = () => {
+  const removeFavourite = (e) => {
+    e.preventDefault();
     fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/favourite/' + movie.id + '/', {method: 'DELETE'})
       .then((response) => {
         if (!response.ok) {
@@ -103,9 +111,11 @@ function MovieThumbnail({isSeen, isFavourite, movie}) {
         }
       });
     setFavourite(false);
+    setSeen(false);
   };
 
-  const addSeen = () => {
+  const addSeen = (e) => {
+    e.preventDefault();
     fetch('http://localhost:8000/api/user/' + userContext.userInfo.username + '/seen/' + movie.id + '/', {method: 'POST'})
       .then((response) => {
         if (!response.ok) {
@@ -133,7 +143,7 @@ function MovieThumbnail({isSeen, isFavourite, movie}) {
             </InfoCaption>
           </Info>
         </Box>
-        <CardActions>
+        <CardActions className={classes.actions}>
           {!favourite &&
             <Tooltip title="Add to favourites" aria-label="add" placement="right">
               <IconButton aria-label="delete" className={classes.addIcon} onClick={addFavourite}>
