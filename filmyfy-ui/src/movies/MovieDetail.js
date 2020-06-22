@@ -124,6 +124,7 @@ const MovieDetail = props => {
           throw error;
         }
       });
+    setIsSeen(false);
     setIsFavorite(false);
   };
 
