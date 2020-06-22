@@ -130,18 +130,48 @@ const MovieList = props => {
   const userContext = useContext(UserContext);
   const [yearFilter, setYearFilter] = React.useState([1900, 2020]);
   const [ratingFilter, setRatingFilter] = React.useState([0, 100]);
-
-  const handleYearfilterChange = (event, newValue) => {
-    setYearFilter(newValue);
-    filterMovies();
-  };
-  const handleRatingfilterChange = (event, newValue) => {
-    setRatingFilter(newValue);
-    filterMovies();
-  };
   const {
     listType
   } = props;
+
+  useEffect(() => {
+    fetchRecommended();
+    fetchFavourites();
+    fetchSeen();
+  }, []);
+
+  useEffect(() => {
+    filterMovies();
+  }, [movies, yearFilter, ratingFilter]);
+
+  useEffect(() => {
+    getNextMovies();
+  }, [filteredMovies]);
+
+  const handleYearFilterChange = (event, newValue) => {
+    setYearFilter(newValue);
+  };
+  const handleRatingFilterChange = (event, newValue) => {
+    setRatingFilter(newValue);
+  };
+
+
+  const filterMovies = () => {
+    setDisplayedItems([]);
+    setLast(0);
+    setFilteredMovies(movies.filter(function (el) {
+      let intYear = parseInt(el.year);
+      return intYear <= yearFilter[1] &&
+        intYear >= yearFilter[0] &&
+        el.rating >= ratingFilter[0] &&
+        el.rating <= ratingFilter[1];
+    }));
+  };
+
+  const getNextMovies = () => {
+    setDisplayedItems(displayedItems.concat(filteredMovies.slice(20*last, 20*last + 20)));
+    setLast(last+1);
+  };
 
   const onSearch = (e) => {
     if (e.key === 'Enter') {
@@ -195,7 +225,6 @@ const MovieList = props => {
       .then((response) => response.json())
       .then((data) => {
         setMovies(data);
-        setFilteredMovies(data);
         setTitle(listType === "recommend" ? "Movies for you" : "Your favourite movies");
         setLoading(false);
       })
@@ -203,33 +232,6 @@ const MovieList = props => {
         console.log('Error: ' + err);
       });
   };
-
-  const filterMovies = () => {
-    setDisplayedItems([]);
-    setLast(0);
-    setFilteredMovies(movies.filter(function (el) {
-      let intYear = parseInt(el.year);
-      return intYear <= yearFilter[1] &&
-        intYear >= yearFilter[0] &&
-        el.rating >= ratingFilter[0] &&
-        el.rating <= ratingFilter[1];
-    }));
-  };
-
-  const getNextMovies = () => {
-    setDisplayedItems(displayedItems.concat(filteredMovies.slice(20*last, 20*last + 20)));
-    setLast(last+1);
-  };
-
-  useEffect(() => {
-    getNextMovies();
-  }, [filteredMovies]);
-
-  useEffect(() => {
-    fetchRecommended();
-    fetchFavourites();
-    fetchSeen();
-  }, []);
 
   return (
     <div className={classes.wrapper}>
@@ -262,7 +264,7 @@ const MovieList = props => {
           </Typography>
           <Slider
             value={ratingFilter}
-            onChange={handleRatingfilterChange}
+            onChange={handleRatingFilterChange}
             valueLabelDisplay="auto"
             aria-labelledby="range-slider"
             getAriaValueText={valuetext}
@@ -278,7 +280,7 @@ const MovieList = props => {
           </Typography>
           <Slider
             value={yearFilter}
-            onChange={handleYearfilterChange}
+            onChange={handleYearFilterChange}
             valueLabelDisplay="auto"
             aria-labelledby="range-slider"
             getAriaValueText={valuetext}
@@ -296,7 +298,7 @@ const MovieList = props => {
       }
       {!loading &&
       <InfiniteScroll
-        dataLength={filteredMovies.length}
+        dataLength={displayedItems.length}
         next={getNextMovies}
         hasMore={last*20 < filteredMovies.length}
         loader={<h4>Loading...</h4>}
@@ -312,7 +314,7 @@ const MovieList = props => {
         justify="center"
         alignItems="center"
       >
-        {filteredMovies.map((i, index) => (
+        {displayedItems.map((i, index) => (
           <MovieThumbnail
             isSeen={seen.includes(i.id)}
             isFavourite={favourites.includes(i.id)}
