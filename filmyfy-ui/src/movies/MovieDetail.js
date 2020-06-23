@@ -156,13 +156,13 @@ const MovieDetail = props => {
         </Grid>
         <Grid item xs={10}>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} md={4}>
           <CardMedia
             className={classes.poster}
             image={movie.poster}
           />
         </Grid>
-        <Grid item xs={8} className={classes.metadataWrapper}>
+        <Grid item xs={12} md={8} className={classes.metadataWrapper}>
           <h1 className={classes.title}> {movie.title} <span className={classes.rating}>{movie.rating}</span></h1>
           <typography className={classes.genres}> {movie.genres.join(" / ")} </typography>
           <h2 typography className={classes.year}> {movie.year} </h2>

@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
-import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import {BrowserRouter as Router, Redirect, Route, Switch} from "react-router-dom";
 import {NotFound} from "./NotFound";
 import Menu from "./menu/Menu";
 import {createMuiTheme, MuiThemeProvider} from "@material-ui/core";
@@ -44,6 +44,8 @@ const App = () => {
       .then(token => {
         if (token) {
           setUserInfo({"token": token, "username": username});
+          localStorage.setItem('token', token.slice(1, -2));
+          localStorage.setItem('username', username);
           onSuccess();
         } else {
           setUserInfo(undefined);
@@ -86,6 +88,8 @@ const App = () => {
 
   const logout = () => {
     setUserInfo(undefined);
+    localStorage.removeItem('username');
+    localStorage.removeItem('token');
   };
 
   const context = {
@@ -105,6 +109,17 @@ const App = () => {
       }
     }
   });
+
+    useEffect(() => {
+      debugger
+      let username = localStorage.getItem("username");
+      let token = localStorage.getItem("token");
+      if (username && token){
+        setUserInfo({"token": token, "username": username});
+      }
+    }, []);
+
+
 
   return (
     <MuiThemeProvider theme={ourTheme}>
@@ -134,6 +149,7 @@ const App = () => {
                 <Route path="/movie/:id/" render={(props) => <MovieDetail {...props} />}/>
                 </>
               }
+
               <Route render={NotFound}/>
             </Switch>
           </div>

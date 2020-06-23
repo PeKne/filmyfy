@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import {fade, makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {useHistory, withRouter} from "react-router-dom";
 import Typography from "@material-ui/core/es/Typography/Typography";
 import Link from "react-router-dom/es/Link";
@@ -10,6 +10,7 @@ import IconButton from "@material-ui/core/es/IconButton/IconButton";
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Tooltip from "@material-ui/core/es/Tooltip/Tooltip";
 import Button from "@material-ui/core/es/Button/Button";
+import AccountBoxIcon from '@material-ui/icons/AccountBox';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -21,9 +22,29 @@ const useStyles = makeStyles((theme) => ({
     textDecoration: 'none',
     color: "#000"
   },
+
+  controlWrapper: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  button: {
+    padding: "3px 0 0 0 !important",
+  },
+  user: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "0 20px",
+  },
   link: {
     textDecoration: 'none',
-    color: "#00AFF5"
+    color: "#00AFF5",
+    padding: "0 20px",
+  },
+  logout: {
+    padding: "0 20px 2px 20px !important"
   }
 }));
 
@@ -40,25 +61,24 @@ const Menu = () => {
     <div className={classes.root}>
       <AppBar position="static" color="transparent">
         <Toolbar>
-          <Typography className={classes.title} variant="h3" noWrap edge="start">
-            <Link to={"/"} className={classes.title}>
-              <b>Filmyfy</b>
+          <Typography edge="start" className={classes.title}>
+            <Link to={"/"}>
+            <img src={process.env.PUBLIC_URL + '/logo_filmyfy.png'} alt="logo" width={270}/>
             </Link>
           </Typography>
-
           {userContext.userInfo &&
-          <>
-            <Button color="secondary">
+          <div className={classes.controlWrapper}>
+            <Button color="secondary" className={classes.button}>
               <Link to={`/`} className={classes.link}>Recommendations</Link>
             </Button>
-            <Button color="secondary">
+            <Button color="secondary" className={classes.button}>
               <Link to={`/favourite`} className={classes.link}>My favourites</Link>
             </Button>
-            <Typography>
-              <b>{userContext.userInfo.username}</b>
+            <Typography className={classes.user}>
+              <AccountBoxIcon/><b>{userContext.userInfo.username}</b>
             </Typography>
             <Tooltip title="Logout">
-              <IconButton aria-label="logout" onClick={() => {
+              <IconButton className={classes.logout} aria-label="logout" onClick={() => {
                 userContext.logout();
                 history.push("/");
               }
@@ -67,7 +87,7 @@ const Menu = () => {
                 <ExitToAppIcon/>
               </IconButton>
             </Tooltip>
-          </>
+          </div>
           }
           </Toolbar>
       </AppBar>

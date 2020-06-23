@@ -1,11 +1,6 @@
 import React from "react";
 import Typography from "@material-ui/core/Typography";
 
-/**
- * Component for informing the user that an error occurred (e.g. 500 from the server).
- *
- * @author Tatiana Fritzová
- */
 const ErrorPage = () => {
   const style = { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
 

@@ -2,11 +2,6 @@ import React from 'react';
 import Typography from '@material-ui/core/Typography';
 
 
-/**
- * Fallback component for paths that has not been mapped to a specific route.
- *
- * @author Tatiana Fritzová
- */
 export function NotFound() {
   return (
     <>
