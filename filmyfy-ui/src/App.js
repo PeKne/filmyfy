@@ -110,16 +110,13 @@ const App = () => {
     }
   });
 
-    useEffect(() => {
-      debugger
-      let username = localStorage.getItem("username");
-      let token = localStorage.getItem("token");
-      if (username && token){
-        setUserInfo({"token": token, "username": username});
-      }
-    }, []);
-
-
+  useEffect(() => {
+    let username = localStorage.getItem("username");
+    let token = localStorage.getItem("token");
+    if (username && token){
+      setUserInfo({"token": token, "username": username});
+    }
+  }, []);
 
   return (
     <MuiThemeProvider theme={ourTheme}>

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import Card from '@material-ui/core/Card';
 import Box from '@material-ui/core/Box';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -128,7 +128,7 @@ function MovieThumbnail({isSeen, isFavourite, movie}) {
   };
 
   return (
-    <Link to={"/movie/" + movie.id + "/"} className={classes.wrapper}>
+    <Link onClick={() => {history.push("/movie/" + movie.id + "/")}} className={classes.wrapper}>
       <Card className={classes.card}>
         <CardMedia
           classes={mediaStyles}

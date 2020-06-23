@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Link, useHistory, withRouter} from "react-router-dom";
+import {useHistory, withRouter} from "react-router-dom";
 import {makeStyles} from '@material-ui/core/styles';
 import Grid from "@material-ui/core/Grid";
 import CardMedia from '@material-ui/core/CardMedia';
@@ -146,13 +146,11 @@ const MovieDetail = props => {
       {movie &&
       <Grid container className={classes.wrapper}>
         <Grid item xs={2} className={classes.buttonWrapper}>
-          <Link onClick={history.goBack}>
             <Tooltip title="Back to overview" aria-label="add" placement="right">
-              <IconButton aria-label="delete" className={classes.icon}>
+              <IconButton aria-label="delete" className={classes.icon} onClick={() => {history.go(-2)}}>
                 <ArrowBack fontSize="large" className={classes.returnButton}/>
               </IconButton>
             </Tooltip>
-          </Link>
         </Grid>
         <Grid item xs={10}>
         </Grid>
